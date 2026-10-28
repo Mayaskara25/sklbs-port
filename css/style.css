@@ -1,0 +1,158 @@
+/* ==========================================================
+   N Litheesh — signal lab
+   Instrument-panel design system: paper panels, ink, one hot
+   signal colour. Everything else is a readout.
+   ========================================================== */
+
+:root {
+  --paper: #ecebe6;
+  --panel: #f6f5f1;
+  --ink: #141414;
+  --ink-2: #4a4a46;
+  --ink-3: #8a8983;
+  --rule: #cfcdc5;
+  --grid: rgba(20, 20, 20, 0.06);
+  --signal: #ff5b1f;
+  --signal-ink: #c63d0a;
+  --ok: #1f9d55;
+  --warn: #e0a100;
+  --screen: #101210;
+  --screen-ink: #b8f5c8;
+  --screen-dim: #3c5a44;
+
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --gutter: clamp(16px, 4vw, 48px);
+  --max: 1240px;
+  --radius: 10px;
+  --bar-h: 56px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121311;
+    --panel: #1a1b19;
+    --ink: #ecebe6;
+    --ink-2: #b4b3ad;
+    --ink-3: #75746e;
+    --rule: #2e2f2c;
+    --grid: rgba(236, 235, 230, 0.05);
+    --signal-ink: #ff7a45;
+    --screen: #0a0c0a;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121311;
+  --panel: #1a1b19;
+  --ink: #ecebe6;
+  --ink-2: #b4b3ad;
+  --ink-3: #75746e;
+  --rule: #2e2f2c;
+  --grid: rgba(236, 235, 230, 0.05);
+  --signal-ink: #ff7a45;
+  --screen: #0a0c0a;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--bar-h) + 16px); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  transition: background-color .3s, color .3s;
+}
+
+a { color: inherit; }
+img, svg, canvas { display: block; max-width: 100%; }
+::selection { background: var(--signal); color: #fff; }
+
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 4px; }
+
+.skip {
+  position: absolute; left: 16px; top: -60px; z-index: 100;
+  background: var(--ink); color: var(--paper); padding: 8px 14px;
+  font-family: var(--mono); font-size: 13px; border-radius: 6px;
+}
+.skip:focus { top: 12px; }
+
+.dim { color: var(--ink-3); }
+.mono { font-family: var(--mono); }
+
+/* ---------- LEDs ---------- */
+.led {
+  --c: var(--ink-3);
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c); flex: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 20%, transparent);
+}
+.led--on   { --c: var(--signal); box-shadow: 0 0 8px var(--signal); animation: blink 2.4s infinite; }
+.led--ok   { --c: var(--ok); }
+.led--warn { --c: var(--warn); animation: blink 1.6s infinite; }
+@keyframes blink { 0%, 70%, 100% { opacity: 1; } 80% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .led { animation: none !important; } }
+
+/* ---------- Top bar ---------- */
+.bar {
+  position: sticky; top: 0; z-index: 50;
+  height: var(--bar-h);
+  display: flex; align-items: center; gap: 24px;
+  padding: 0 var(--gutter);
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono); font-size: 13px; letter-spacing: .02em;
+}
+.bar__id {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; font-weight: 600; white-space: nowrap;
+}
+.bar__nav { display: flex; gap: 4px; margin: 0 auto; }
+.bar__nav a {
+  text-decoration: none; padding: 6px 10px; border-radius: 6px;
+  text-transform: uppercase; transition: background .2s, color .2s;
+}
+.bar__nav a:hover, .bar__nav a.is-active { background: var(--ink); color: var(--paper); }
+.bar__nav a:hover .dim, .bar__nav a.is-active .dim { color: var(--signal); }
+.bar__meta { display: flex; align-items: center; gap: 16px; }
+.readout { color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.bar__scroll { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; }
+.bar__scroll span { display: block; height: 100%; width: 0; background: var(--signal); }
+
+.switch {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: 0; padding: 4px; cursor: pointer;
+  font: inherit; color: var(--ink-2);
+}
+.switch__track {
+  width: 34px; height: 18px; border-radius: 9px;
+  background: var(--rule); position: relative; transition: background .2s;
+}
+.switch__knob {
+  position: absolute; top: 2px; left: 2px; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--ink); transition: transform .25s cubic-bezier(.5, 1.6, .5, 1);
+}
+.switch[aria-pressed="true"] .switch__track { background: var(--signal); }
+.switch[aria-pressed="true"] .switch__knob { transform: translateX(16px); background: #fff; }
+
+@media (max-width: 900px) {
+  .bar__nav { display: none; }
+  .bar__meta { margin-left: auto; }
+}
+@media (max-width: 420px) {
+  .bar__id .dim, .switch__label { display: none; }
+}
