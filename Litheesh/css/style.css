@@ -185,7 +185,7 @@ img, svg, canvas { display: block; max-width: 100%; }
 .hero {
   display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(32px, 5vw, 72px);
   align-items: center;
-  min-height: calc(100svh - var(--bar-h));
+  min-height: min(calc(100svh - var(--bar-h)), 900px);
   padding-top: 48px; padding-bottom: 64px;
 }
 .hero h1 {
@@ -352,20 +352,20 @@ img, svg, canvas { display: block; max-width: 100%; }
 /* EmbedEd bars */
 .bars { margin: 0; padding: 14px; border-radius: 8px; background: var(--screen); color: var(--screen-ink); display: grid; gap: 8px; }
 .bars figcaption { color: #6f9a7a; margin-bottom: 2px; }
-.bar { display: grid; grid-template-columns: 112px 1fr 36px; align-items: center; gap: 10px; font-family: var(--mono); font-size: 11.5px; }
-.bar span { color: #8fbf9b; white-space: nowrap; }
-.bar b { height: 10px; border-radius: 2px; background: #1c2a20; position: relative; overflow: hidden; }
-.bar b::after {
+.f1 { display: grid; grid-template-columns: 112px 1fr 36px; align-items: center; gap: 10px; font-family: var(--mono); font-size: 11.5px; }
+.f1 span { color: #8fbf9b; white-space: nowrap; }
+.f1 b { height: 10px; border-radius: 2px; background: #1c2a20; position: relative; overflow: hidden; }
+.f1 b::after {
   content: ""; position: absolute; inset: 0; width: calc(var(--v) * 100%);
   background: var(--screen-ink); transform-origin: left; transform: scaleX(0);
   transition: transform 1.1s .2s cubic-bezier(.2, .7, .2, 1);
 }
-.is-in .bar b::after, html:not(.js) .bar b::after { transform: scaleX(1); }
-.bar--win b::after { background: var(--signal); }
-.bar em { font-style: normal; text-align: right; font-weight: 600; }
-.bar--win em { color: var(--signal); }
+.is-in .f1 b::after, html:not(.js) .f1 b::after { transform: scaleX(1); }
+.f1--win b::after { background: var(--signal); }
+.f1 em { font-style: normal; text-align: right; font-weight: 600; }
+.f1--win em { color: var(--signal); }
 .bars__note { margin: 4px 0 0; font-family: var(--mono); font-size: 11px; color: #6f9a7a; }
-@media (prefers-reduced-motion: reduce) { .bar b::after { transform: none; transition: none; } }
+@media (prefers-reduced-motion: reduce) { .f1 b::after { transform: none; transition: none; } }
 
 /* CMatLib stack */
 .stack { display: grid; gap: 4px; font-family: var(--mono); font-size: 12.5px; }
@@ -479,7 +479,7 @@ img, svg, canvas { display: block; max-width: 100%; }
 
 .ic {
   position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px;
-  background: var(--ink); color: var(--paper); border-radius: 10px;
+  background: #141414; color: #ecebe6; border-radius: 10px;
   font-family: var(--mono); text-align: center;
   background-image: repeating-linear-gradient(0deg, transparent 0 22px, rgba(255,255,255,.03) 22px 23px);
 }
