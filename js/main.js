@@ -52,4 +52,19 @@
     });
   }, { rootMargin: "-45% 0px -50% 0px" });
   $$("main section[id]").forEach((s) => spy.observe(s));
+
+  /* ---------- Reveal on scroll ---------- */
+  const revealEls = $$(".reveal");
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach((el) => el.classList.add("is-in"));
+  } else {
+    const rev = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("is-in");
+        rev.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -10% 0px" });
+    revealEls.forEach((el) => rev.observe(el));
+  }
 })();
