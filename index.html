@@ -38,9 +38,40 @@
   </header>
 
   <main id="main">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero__copy">
+        <p class="eyebrow"><span class="led led--on" aria-hidden="true"></span> CH-00 · Input signal</p>
+        <h1 id="hero-title">Hardware that <em>listens.</em><br>Software that <em>learns.</em></h1>
+        <p class="lede">I'm N Litheesh, a first-year computer science student at RV College of Engineering, Bengaluru. I build across embedded systems, machine learning and the low-level code underneath them, and I like pointing that work at problems in the city I live in.</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="#work">See my projects <span aria-hidden="true">→</span></a>
+          <a class="btn" href="#contact">Get in touch</a>
+        </div>
+      </div>
+
+      <figure class="scope" id="scope">
+        <div class="scope__head">
+          <span>MIC ARRAY · 4CH · TDOA</span>
+          <span class="scope__live"><span class="led led--on" aria-hidden="true"></span> LIVE</span>
+        </div>
+        <div class="scope__screen">
+          <canvas id="array" aria-label="Interactive simulation: four microphones estimate the direction of a sound source that follows your pointer." role="img"></canvas>
+          <canvas id="traces" aria-hidden="true"></canvas>
+        </div>
+        <dl class="scope__read">
+          <div><dt>Bearing (est.)</dt><dd id="r-est">---.-°</dd></div>
+          <div><dt>True</dt><dd id="r-true">---.-°</dd></div>
+          <div><dt>Δt x / y</dt><dd id="r-dt">--- / --- µs</dd></div>
+          <div><dt>Source</dt><dd id="r-src">AUTO</dd></div>
+        </dl>
+        <figcaption>Move your pointer over the screen: it's the siren. Each mic hears the wavefront at a slightly different moment, and those few microseconds give away the direction. Same idea as my <a href="#siren">siren detector</a>.</figcaption>
+      </figure>
+    </section>
+
     <!-- sections -->
   </main>
 
   <script src="js/main.js"></script>
+  <script src="js/hero.js"></script>
 </body>
 </html>
