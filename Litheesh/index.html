@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>N Litheesh — Portfolio</title>
+  <meta name="description" content="N Litheesh, computer science student at RV College of Engineering, Bengaluru. Embedded systems, machine learning and low-level software.">
+  <meta name="theme-color" content="#ecebe6">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141414'/%3E%3Cpath d='M4 16h5l3-8 4 16 4-12 3 4h5' fill='none' stroke='%23ff5b1f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="bar" id="top">
+    <a class="bar__id" href="#top" aria-label="Back to top">
+      <span class="led led--on" aria-hidden="true"></span>
+      N.LITHEESH <span class="dim">/ LAB-01</span>
+    </a>
+    <nav class="bar__nav" aria-label="Sections">
+      <a href="#about"><span class="dim">01</span> About</a>
+      <a href="#work"><span class="dim">02</span> Work</a>
+      <a href="#built"><span class="dim">03</span> Built</a>
+      <a href="#skills"><span class="dim">04</span> Skills</a>
+      <a href="#contact"><span class="dim">05</span> Contact</a>
+    </nav>
+    <div class="bar__meta">
+      <span class="readout" id="clock" title="Local time in Bengaluru">BLR --:--</span>
+      <button class="switch" id="theme" type="button" aria-label="Toggle dark mode" aria-pressed="false">
+        <span class="switch__track"><span class="switch__knob"></span></span>
+        <span class="switch__label">DARK</span>
+      </button>
+    </div>
+    <div class="bar__scroll" aria-hidden="true"><span id="scrollbar"></span></div>
+  </header>
+
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero__copy">
+        <p class="eyebrow"><span class="led led--on" aria-hidden="true"></span> CH-00 · Input signal</p>
+        <h1 id="hero-title">Hardware that <em>listens.</em><br>Software that <em>learns.</em></h1>
+        <p class="lede">I'm N Litheesh, a first-year computer science student at RV College of Engineering, Bengaluru. I build across embedded systems, machine learning and the low-level code underneath them, and I like pointing that work at problems in the city I live in.</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="#work">See my projects <span aria-hidden="true">→</span></a>
+          <a class="btn" href="#contact">Get in touch</a>
+        </div>
+      </div>
+
+      <figure class="scope" id="scope">
+        <div class="scope__head">
+          <span>MIC ARRAY · 4CH · TDOA</span>
+          <span class="scope__live"><span class="led led--on" aria-hidden="true"></span> LIVE</span>
+        </div>
+        <div class="scope__screen">
+          <canvas id="array" aria-label="Interactive simulation: four microphones estimate the direction of a sound source that follows your pointer." role="img"></canvas>
+          <canvas id="traces" aria-hidden="true"></canvas>
+        </div>
+        <dl class="scope__read">
+          <div><dt>Bearing (est.)</dt><dd id="r-est">---.-°</dd></div>
+          <div><dt>True</dt><dd id="r-true">---.-°</dd></div>
+          <div><dt>Δt x / y</dt><dd id="r-dt">--- / --- µs</dd></div>
+          <div><dt>Source</dt><dd id="r-src">AUTO</dd></div>
+        </dl>
+        <figcaption>Move your pointer over the screen: it's the siren. Each mic hears the wavefront at a slightly different moment, and those few microseconds give away the direction. Same idea as my <a href="#siren">siren detector</a>.</figcaption>
+      </figure>
+    </section>
+
+    <section class="sec wrap" id="about" aria-labelledby="about-title">
+      <header class="sec-head">
+        <span class="sec-num">01</span>
+        <h2 id="about-title">About</h2>
+        <span class="sec-tag">Signal → decision</span>
+      </header>
+
+      <div class="about">
+        <div class="about__text reveal">
+          <p class="about__big">Most of what I build starts with a real-world signal <span class="signal-list">(a siren in traffic, water in a drain, a pile of past exam papers)</span> and ends with software that makes a decision from it.</p>
+          <p>I've written a neural network library from scratch in C, wired microphone arrays to an ESP32 microcontroller to locate sound, and worked with teammates on research-style projects in exam analysis, code similarity and city-scale routing. Right now I'm learning full-stack web development by building a visual automation builder.</p>
+          <p>I care about knowing how things work one layer down, and about being honest about what a project does and doesn't prove.</p>
+        </div>
+
+        <aside class="spec reveal" aria-label="Quick facts">
+          <div class="spec__head"><span>Quick facts</span><span class="dim">REV 2026.10</span></div>
+          <dl>
+            <div><dt>Studying</dt><dd>B.E. Computer Science, RV College of Engineering</dd></div>
+            <div><dt>Based in</dt><dd>Bengaluru, India</dd></div>
+            <div><dt>Working across</dt><dd>Embedded systems, machine learning, systems programming</dd></div>
+            <div><dt>Currently</dt><dd>Learning React; <strong class="hl">open to internships</strong></dd></div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <section class="sec wrap" id="work" aria-labelledby="work-title">
+      <header class="sec-head">
+        <span class="sec-num">02</span>
+        <h2 id="work-title">Selected work</h2>
+        <span class="sec-tag">5 datasheets</span>
+      </header>
+      <div class="sec-intro">
+        <p>Projects I've driven or contributed to substantially.</p>
+        <p class="legend"><span><span class="led led--ok"></span> Complete</span><span><span class="led led--warn"></span> In progress</span></p>
+      </div>
+
+      <div class="sheets">
+        <!-- 01 Siren -->
+        <article class="sheet reveal" id="siren">
+          <div class="sheet__top">
+            <span class="sheet__pn">LT-01 · AUDIO / EMBEDDED</span>
+            <span class="status"><span class="led led--warn"></span> In development · Course lab project</span>
+          </div>
+          <h3>Emergency vehicle siren detection with phase-aware signal preemption</h3>
+          <p class="sheet__sum">A system that hears an approaching ambulance, works out which direction it's coming from, and changes the traffic signal with as little disruption as possible.</p>
+          <div class="sheet__body">
+            <ul class="sheet__list">
+              <li>Two-stage design: an ESP32 with MEMS microphones screens audio on the device, and a convolutional neural network on a Flask server confirms the siren.</li>
+              <li>Finds direction from the tiny difference in when the sound reaches each microphone, using a cross-correlation method called GCC-PHAT.</li>
+              <li>The signal-change logic covers four traffic-light phase scenarios, so it only intervenes as much as needed.</li>
+              <li>Trained on a siren dataset I recorded myself on Bengaluru roads.</li>
+            </ul>
+            <aside class="sheet__spec">
+              <p class="spec-label">Tools</p>
+              <ul class="chips"><li>ESP32</li><li>INMP441 microphones</li><li>Signal processing</li><li>CNN</li><li>Flask</li></ul>
+              <div class="pipeline" aria-label="Pipeline: microphones, ESP32 screen, CNN confirm, direction, signal preemption">
+                <span>MEMS ×N</span><i></i><span>ESP32 screen</span><i></i><span>CNN confirm</span><i></i><span>GCC-PHAT bearing</span><i></i><span class="pipeline__out">Signal phase</span>
+              </div>
+              <a class="link-arrow" href="#top">Try the direction-finding demo <span aria-hidden="true">↑</span></a>
+            </aside>
+          </div>
+        </article>
+
+        <!-- 02 EmbedEd -->
+        <article class="sheet reveal" id="embeded">
+          <div class="sheet__top">
+            <span class="sheet__pn">LT-02 · ML RESEARCH</span>
+            <span class="status"><span class="led led--ok"></span> Experiments complete, paper drafted · Team of 4, college project</span>
+          </div>
+          <h3>EmbedEd: does the choice of training negatives matter?</h3>
+          <p class="sheet__sum">When you fine-tune a model to tell similar things apart, you train it on pairs that should match and “negatives” that shouldn't. We tested whether picking harder negatives makes a code-understanding model better at spotting duplicate code.</p>
+          <div class="sheet__body">
+            <ul class="sheet__list">
+              <li>Fine-tuned GraphCodeBERT on the BigCloneBench duplicate-code dataset under seven conditions: random, keyword-matched (BM25) and meaning-matched negatives, each with and without a filter, plus an untrained baseline.</li>
+              <li><strong>Result:</strong> random negatives scored best, with an F1 score (a combined accuracy measure from 0 to 1) of 0.75, against 0.26 for the untrained model. The “smarter” hard negatives were no better than the baseline.</li>
+              <li>Traced the failure to hard negatives that were actually duplicates themselves, plus a loss margin too small for the model's narrow similarity range. Filtering helped (0.42 to 0.47), but still didn't beat random.</li>
+              <li>Tested generalisation on code tasks the model had never seen, with F1 between about 0.67 and 0.72.</li>
+              <li>Written up as a five-page IEEE-format paper, plus a demo page comparing all seven models.</li>
+            </ul>
+            <aside class="sheet__spec">
+              <figure class="bars" aria-label="F1 scores: untrained 0.26, hard negatives before filter 0.42, after filter 0.47, random negatives 0.75">
+                <figcaption class="spec-label">F1 on BigCloneBench</figcaption>
+                <div class="f1" style="--v:.26"><span>Untrained</span><b></b><em>0.26</em></div>
+                <div class="f1" style="--v:.42"><span>Hard, unfiltered</span><b></b><em>0.42</em></div>
+                <div class="f1" style="--v:.47"><span>Hard, filtered</span><b></b><em>0.47</em></div>
+                <div class="f1 f1--win" style="--v:.75"><span>Random</span><b></b><em>0.75</em></div>
+                <p class="bars__note">Unseen tasks: F1 ≈ 0.67–0.72</p>
+              </figure>
+              <p class="spec-label">Tools</p>
+              <ul class="chips"><li>Python</li><li>PyTorch</li><li>GraphCodeBERT</li><li>Hugging Face</li><li>Google Colab</li></ul>
+              <a class="link-arrow" href="https://github.com/ksu-gitreaper807/EmbedEd" target="_blank" rel="noopener">github.com/ksu-gitreaper807/EmbedEd <span aria-hidden="true">↗</span></a>
+            </aside>
+          </div>
+        </article>
+
+        <!-- 03 CMatLib -->
+        <article class="sheet reveal" id="cmatlib">
+          <div class="sheet__top">
+            <span class="sheet__pn">LT-03 · SYSTEMS / ML</span>
+            <span class="status"><span class="led led--ok"></span> Working library · College project</span>
+          </div>
+          <h3>CMatLib: a neural network library in pure C</h3>
+          <p class="sheet__sum">A modular neural network framework written from scratch in C, with a Python bridge so it can be driven from familiar tooling.</p>
+          <div class="sheet__body">
+            <ul class="sheet__list">
+              <li>Matrix operations, layers and the training loop built without any external machine learning libraries.</li>
+              <li>Python bindings through ctypes.</li>
+              <li><strong>Next:</strong> benchmarks against TensorFlow Lite Micro and tinygrad before submitting to an open-source software journal.</li>
+            </ul>
+            <aside class="sheet__spec">
+              <div class="stack" aria-label="Layers: Python via ctypes, then layers and training loop, then matrix operations in C">
+                <div><span>Python</span><small>ctypes bridge</small></div>
+                <div><span>Layers · training loop</span><small>C</small></div>
+                <div class="stack__base"><span>Matrix ops</span><small>C, zero ML deps</small></div>
+              </div>
+              <p class="spec-label">Tools</p>
+              <ul class="chips"><li>C</li><li>Python ctypes</li><li>Neural networks</li></ul>
+            </aside>
+          </div>
+        </article>
+
+        <!-- 04 ExamLens -->
+        <article class="sheet reveal" id="examlens">
+          <div class="sheet__top">
+            <span class="sheet__pn">LT-04 · NLP / EDTECH</span>
+            <span class="status"><span class="led led--ok"></span> Built, paper written · Team of 4, faculty-mentored</span>
+          </div>
+          <h3>ExamLens: question paper analysis</h3>
+          <p class="sheet__sum">A tool that reads past question papers and tells students and teachers what's really being tested.</p>
+          <div class="sheet__body">
+            <ul class="sheet__list">
+              <li>Tags each question by Bloom's Taxonomy level (from simple recall up to creating something new) and scores its difficulty.</li>
+              <li>Finds repeated questions using meaning-based text similarity, and flags syllabus topics that never appear.</li>
+              <li>Written up as an IEEE-format conference paper.</li>
+            </ul>
+            <aside class="sheet__spec">
+              <ol class="bloom" aria-label="Bloom's Taxonomy levels, from recall to create">
+                <li>Create</li><li>Evaluate</li><li>Analyse</li><li>Apply</li><li>Understand</li><li>Remember</li>
+              </ol>
+              <p class="spec-label">Tools</p>
+              <ul class="chips"><li>Python</li><li>Streamlit</li><li>Large language models</li><li>Semantic similarity</li></ul>
+            </aside>
+          </div>
+        </article>
+
+        <!-- 05 Routing -->
+        <article class="sheet reveal" id="routing">
+          <div class="sheet__top">
+            <span class="sheet__pn">LT-05 · GRAPHS / BIO-INSPIRED</span>
+            <span class="status"><span class="led led--warn"></span> In progress · Team of 4, Bioinspired Engineering course</span>
+          </div>
+          <h3>Self-healing routing on Bengaluru's road network</h3>
+          <p class="sheet__sum">How quickly can a routing algorithm recover when a road suddenly closes? We compare nature-inspired methods against classical shortest-path search on real city data.</p>
+          <div class="sheet__body">
+            <ul class="sheet__list">
+              <li>Ant colony optimisation and slime-mould (Physarum) network growth versus Dijkstra and A* search.</li>
+              <li>Real Bengaluru road network from OpenStreetMap, with traffic simulated in SUMO.</li>
+              <li>One shared benchmark measuring recovery after road and junction failures.</li>
+            </ul>
+            <aside class="sheet__spec">
+              <div class="route">
+                <canvas id="route-cv" role="img" aria-label="Interactive road graph. Click a road to close it and the shortest route is recomputed."></canvas>
+                <div class="route__bar">
+                  <span id="route-read" aria-live="polite">ROUTE --</span>
+                  <button class="route__reset" id="route-reset" type="button">Reopen all</button>
+                </div>
+              </div>
+              <p class="route__note">Tap a road to close it. A toy Dijkstra reroute on a made-up grid; the real project runs on Bengaluru's OpenStreetMap network.</p>
+              <p class="spec-label">Tools</p>
+              <ul class="chips"><li>Python</li><li>OpenStreetMap</li><li>SUMO</li><li>Graph algorithms</li></ul>
+            </aside>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="sec wrap" id="built" aria-labelledby="built-title">
+      <header class="sec-head">
+        <span class="sec-num">03</span>
+        <h2 id="built-title">Also built</h2>
+        <span class="sec-tag">Parts bin</span>
+      </header>
+      <div class="sec-intro"><p>Smaller builds, hackathon work and projects in progress.</p></div>
+
+      <ul class="bin">
+        <li class="bin__row reveal">
+          <span class="bin__idx">A1</span>
+          <div class="bin__main">
+            <h3>Ghost Data Still Exists</h3>
+            <p>Built in 24 hours for HackerRank Orchestrate (October 2026): an agent that audits whether data a service says it deleted is actually gone.</p>
+          </div>
+          <div class="bin__meta">
+            <span class="status"><span class="led led--ok"></span> Hackathon entry, solo</span>
+            <span class="bin__badge">24 h</span>
+          </div>
+        </li>
+
+        <li class="bin__row reveal">
+          <span class="bin__idx">A2</span>
+          <div class="bin__main">
+            <h3>Drain health monitoring system</h3>
+            <p>An ESP32 with six sensors streaming to Firebase, plus a Streamlit dashboard that flags drains likely to block before they overflow.</p>
+            <ul class="chips"><li>ESP32</li><li>Firebase</li><li>Streamlit</li></ul>
+          </div>
+          <div class="bin__meta">
+            <span class="status"><span class="led led--ok"></span> Completed</span>
+            <span class="bin__badge">6 sensors</span>
+          </div>
+        </li>
+
+        <li class="bin__row bin__row--wide reveal">
+          <span class="bin__idx">A3</span>
+          <div class="bin__main">
+            <h3>Mini version control system</h3>
+            <p>A Git-style content-addressable store in C, where every file and commit is saved under the hash of its contents. It uses hashed blobs, trees and commits, a Merkle tree and a commit history graph.</p>
+            <ul class="chips"><li>C</li><li>Hash tables</li><li>Merkle trees</li></ul>
+          </div>
+          <div class="bin__meta">
+            <span class="status"><span class="led led--warn"></span> In progress</span>
+          </div>
+          <div class="hashlab">
+            <div class="hashlab__in">
+              <label for="blob-in" class="spec-label">Blob contents: edit me</label>
+              <textarea id="blob-in" rows="3" spellcheck="false">Hardware that listens.
+Software that learns.</textarea>
+            </div>
+            <div class="hashlab__out">
+              <p class="spec-label">Stored at</p>
+              <output id="blob-out" for="blob-in" aria-live="polite">.git/objects/--/----</output>
+              <p class="hashlab__note">SHA-1 of <code>"blob &lt;size&gt;\0" + contents</code>, the same address <code>git hash-object</code> gives. Change one character and the whole address changes.</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="bin__row reveal">
+          <span class="bin__idx">A4</span>
+          <div class="bin__main">
+            <h3>Visual automation builder</h3>
+            <p>A full-stack app where users connect triggers to actions on a node canvas, and an execution engine runs the workflow.</p>
+            <ul class="chips"><li>React</li><li>Node graph</li><li>APIs</li></ul>
+          </div>
+          <div class="bin__meta">
+            <span class="status"><span class="led led--warn"></span> In progress</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="sec wrap" id="skills" aria-labelledby="skills-title">
+      <header class="sec-head">
+        <span class="sec-num">04</span>
+        <h2 id="skills-title">Skills</h2>
+        <span class="sec-tag">Pinout</span>
+      </header>
+
+      <div class="pinout reveal">
+        <div class="pins pins--l">
+          <div class="pin">
+            <span class="pin__no">01</span>
+            <h3>Languages</h3>
+            <ul class="chips"><li>C</li><li>Python</li><li>JavaScript</li><li>HTML</li><li>CSS</li></ul>
+          </div>
+          <div class="pin">
+            <span class="pin__no">02</span>
+            <h3>Machine learning</h3>
+            <ul class="chips"><li>Convolutional networks</li><li>Contrastive fine-tuning</li><li>Text similarity</li><li>Large language models</li></ul>
+          </div>
+          <div class="pin">
+            <span class="pin__no">03</span>
+            <h3>Embedded and signals</h3>
+            <ul class="chips"><li>ESP32</li><li>MEMS microphones</li><li>Sound direction finding</li><li>Sensor dashboards</li><li>Firebase</li></ul>
+          </div>
+        </div>
+
+        <div class="ic" aria-hidden="true">
+          <span class="ic__notch"></span>
+          <span class="ic__dot"></span>
+          <span class="ic__name">LTH-27</span>
+          <span class="ic__sub">N LITHEESH</span>
+          <span class="ic__sub dim">RVCE · CSE · BLR</span>
+        </div>
+
+        <div class="pins pins--r">
+          <div class="pin">
+            <span class="pin__no">04</span>
+            <h3>Systems</h3>
+            <ul class="chips"><li>Memory-level C</li><li>Hashing</li><li>Tree and graph data structures</li></ul>
+          </div>
+          <div class="pin">
+            <span class="pin__no">05</span>
+            <h3>Web and apps</h3>
+            <ul class="chips"><li>Flask</li><li>Streamlit</li><li>Tailwind</li><li class="chip--learning">Learning React</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec wrap" id="contact" aria-labelledby="contact-title">
+      <header class="sec-head">
+        <span class="sec-num">05</span>
+        <h2>Contact</h2>
+        <span class="sec-tag">Open ports</span>
+      </header>
+
+      <div class="contact">
+        <div class="contact__lead reveal">
+          <h2 class="contact__big" id="contact-title">Let's build something <em>useful.</em></h2>
+          <p>I'm looking for internships and collaborations in machine learning, embedded systems or backend engineering.</p>
+        </div>
+
+        <ul class="ports reveal">
+          <!-- TODO: add your email and résumé, e.g.
+          <li><a href="mailto:you@example.com"><span class="ports__k">Email</span><span class="ports__v">you@example.com</span><span class="ports__go" aria-hidden="true">→</span></a></li>
+          <li><a href="resume.pdf" target="_blank" rel="noopener"><span class="ports__k">Résumé</span><span class="ports__v">PDF</span><span class="ports__go" aria-hidden="true">↗</span></a></li>
+          -->
+          <li><a href="https://github.com/Litheesh27" target="_blank" rel="noopener"><span class="ports__k">GitHub</span><span class="ports__v">github.com/Litheesh27</span><span class="ports__go" aria-hidden="true">↗</span></a></li>
+          <li><a href="https://www.linkedin.com/in/litheesh-n-544003370" target="_blank" rel="noopener"><span class="ports__k">LinkedIn</span><span class="ports__v">linkedin.com/in/litheesh-n-544003370</span><span class="ports__go" aria-hidden="true">↗</span></a></li>
+          <li><a href="https://leetcode.com/u/Suv27oA3kD" target="_blank" rel="noopener"><span class="ports__k">LeetCode</span><span class="ports__v">leetcode.com/u/Suv27oA3kD</span><span class="ports__go" aria-hidden="true">↗</span></a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot wrap">
+    <span>© 2026 N Litheesh</span>
+    <span class="dim">Hand-written HTML, CSS &amp; JS. No frameworks.</span>
+    <a href="#top" class="foot__top">Back to top <span aria-hidden="true">↑</span></a>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/hero.js"></script>
+  <script src="js/demos.js"></script>
+</body>
+</html>
