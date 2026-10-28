@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mayaskara Bhat — Portfolio</title>
+<meta name="description" content="Mayaskara Bhat — Computer Science @ RVCE. Startup operations, AI automation and business development.">
+<meta name="theme-color" content="#03030f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#6ff2ff; --violet:#a78bfa; --pink:#ff7ad9; --gold:#ffd97a;
+  --bg0:#03030f; --ink:#e8ecff; --muted:#8b93c9; --line:rgba(140,160,255,.18);
+  --glass:rgba(10,12,38,.62); --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--bg0);font-family:'Space Grotesk',system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+canvas#space{position:fixed;inset:0;z-index:0;touch-action:none;cursor:grab}
+canvas#space.pointer{cursor:pointer}
+canvas#space.grabbing{cursor:grabbing}
+
+/* ---------- HUD ---------- */
+.hud{position:fixed;z-index:10;transition:opacity .4s,transform .5s var(--ease)}
+.glass{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line)}
+
+#topbar{top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 22px;pointer-events:none}
+#topbar>*{pointer-events:auto}
+.brand{font-family:'Orbitron';font-weight:900;letter-spacing:3px;font-size:15px;cursor:pointer;
+  background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand small{display:block;font-family:'Space Grotesk';font-weight:400;letter-spacing:4px;font-size:9px;margin-top:2px;color:var(--muted);-webkit-text-fill-color:var(--muted)}
+.tools{display:flex;gap:8px}
+.tbtn{display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:12px;font-size:12.5px;color:#c7cdf5;text-decoration:none;transition:.25s}
+.tbtn:hover{color:#fff;border-color:rgba(111,242,255,.5);box-shadow:0 0 18px rgba(111,242,255,.15)}
+.tbtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tbtn kbd{font-family:inherit;font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+.tbtn.primary{color:#03111f;background:linear-gradient(90deg,var(--cyan),var(--violet));border:none;font-weight:600}
+.tbtn.primary:hover{color:#03111f;box-shadow:0 0 22px rgba(120,200,255,.45)}
+
+#nav{bottom:22px;left:50%;transition:left .6s var(--ease),opacity .4s;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:6px;border-radius:18px}
+.navbtn{display:flex;align-items:center;gap:7px;font-family:'Orbitron';font-size:10.5px;letter-spacing:1.8px;color:#aeb6ff;
+  padding:9px 14px;border-radius:13px;transition:color .25s,background .25s,box-shadow .25s;white-space:nowrap}
+.navbtn i{font-style:normal;font-family:'Space Grotesk';font-size:10px;color:#6a72a6;letter-spacing:0}
+.navbtn:hover{color:#fff;background:rgba(120,140,255,.1)}
+.navbtn.active{color:#03111f;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 18px rgba(120,200,255,.4)}
+.navbtn.active i{color:#1b2550}
+.navarrow{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:#aeb6ff;font-size:18px;transition:.25s}
+.navarrow:hover{color:#fff;background:rgba(120,140,255,.12)}
+.navsep{width:1px;height:22px;background:var(--line);margin:0 2px}
+
+#hint{bottom:84px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:1.5px;color:#8a92c4;white-space:nowrap;
+  padding:7px 14px;border-radius:20px;pointer-events:none}
+#hint b{color:#cfd5ff;font-weight:500}
+#hint.gone{opacity:0}
+
+#mapdock{left:22px;bottom:22px;padding:8px;border-radius:16px;display:flex;flex-direction:column;gap:6px}
+#minimap{width:176px;height:124px;display:block;border-radius:10px;cursor:pointer;background:rgba(3,4,18,.6)}
+.zoomrow{display:flex;gap:6px}
+.zoomrow button{flex:1;height:30px;border-radius:9px;border:1px solid var(--line);color:#aeb6ff;font-size:15px;transition:.2s}
+.zoomrow button:hover{color:#fff;border-color:rgba(111,242,255,.5)}
+#zoomlvl{flex:1.3;display:grid;place-items:center;font-size:10.5px;color:var(--muted);letter-spacing:1px;font-variant-numeric:tabular-nums}
+
+#rail{top:50%;right:22px;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px}
+#rail a,#rail button{color:#8f9adf;transition:.25s;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(10,12,36,.5);backdrop-filter:blur(8px)}
+#rail a:hover,#rail button:hover{color:#fff;border-color:var(--cyan);box-shadow:0 0 16px rgba(110,240,255,.4);transform:scale(1.08)}
+#rail svg{width:17px;height:17px;fill:currentColor}
+@media(min-width:761px){body.panel-open #nav{left:calc((100vw - min(500px,100vw - 24px) - 12px)/2)}body.panel-open #hint,body.panel-open #mapdock{opacity:0;pointer-events:none}}
+body.panel-open #rail{opacity:0;pointer-events:none}
+
+#tip{position:fixed;z-index:15;pointer-events:none;padding:8px 12px;border-radius:10px;font-size:12px;opacity:0;transform:translateY(4px);
+  transition:opacity .15s,transform .15s;max-width:260px}
+#tip.show{opacity:1;transform:none}
+#tip b{display:block;color:#fff;font-weight:500;font-size:13px}
+#tip span{color:var(--muted);font-size:11px}
+
+/* ---------- Panel (drawer) ---------- */
+#panel{position:fixed;z-index:20;top:12px;right:12px;bottom:12px;width:min(500px,calc(100vw - 24px));display:flex;flex-direction:column;
+  transform:translateX(calc(100% + 30px));transition:transform .6s var(--ease);
+  background:linear-gradient(160deg,rgba(14,16,48,.9),rgba(6,8,28,.94));border:1px solid rgba(140,160,255,.22);border-radius:22px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 20px 80px rgba(0,0,0,.5),0 0 60px rgba(80,120,255,.18)}
+#panel.open{transform:none}
+#pscroll{flex:1;overflow-y:auto;padding:34px 32px 24px;outline:none;overscroll-behavior:contain}
+#pscroll::-webkit-scrollbar,#rbody::-webkit-scrollbar{width:6px}
+#pscroll::-webkit-scrollbar-thumb,#rbody::-webkit-scrollbar-thumb{background:#3a427a;border-radius:4px}
+#close{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;color:var(--muted);font-size:18px;transition:.3s;z-index:2}
+#close:hover{color:var(--pink);transform:rotate(90deg);background:rgba(255,122,217,.08)}
+#pfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
+#pfoot button{display:flex;align-items:center;gap:6px;font-size:12px;color:#aeb6ff;padding:8px 12px;border-radius:10px;transition:.2s;max-width:44%}
+#pfoot button:hover{color:#fff;background:rgba(120,140,255,.1)}
+#pfoot span{font-family:'Orbitron';font-size:10px;letter-spacing:2px;color:#6a72a6}
+
+.ptag{font-family:'Orbitron';font-size:10px;letter-spacing:4px;color:var(--cyan);text-transform:uppercase;margin-bottom:10px}
+.ptitle{font-family:'Orbitron';font-size:clamp(22px,4vw,30px);font-weight:700;line-height:1.15;margin-bottom:6px;
+  background:linear-gradient(90deg,#fff,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.psub{color:#9aa3d8;font-size:14px;margin-bottom:20px;letter-spacing:.3px}
+.pbody{font-size:14.5px;line-height:1.75;color:#c9d0f5}
+.pbody p+p{margin-top:10px}
+.pbody h3{font-family:'Orbitron';font-size:10.5px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin:24px 0 10px}
+.pbody ul{list-style:none}
+.pbody li{position:relative;padding-left:18px;margin:7px 0}
+.pbody li::before{content:'';position:absolute;left:2px;top:.72em;width:6px;height:6px;border-radius:50%;background:var(--violet);box-shadow:0 0 8px var(--violet)}
+.pbody a{color:var(--cyan);text-decoration:none}
+.block{padding:16px 18px;margin:10px 0;border-radius:14px;background:rgba(30,36,80,.3);border:1px solid rgba(120,140,255,.14);transition:box-shadow .4s}
+.block b{color:#fff;font-size:14.5px;font-weight:600}
+.block .org{color:var(--pink);font-size:11.5px;margin:3px 0 8px;letter-spacing:1px;text-transform:uppercase}
+.block p,.block li{color:#b8c0e8;font-size:13.3px;line-height:1.7}
+.hl{animation:hl 2.4s ease}
+@keyframes hl{0%,45%{box-shadow:0 0 0 1.5px var(--cyan),0 0 34px rgba(110,240,255,.3)}100%{box-shadow:0 0 0 0 transparent}}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 20px}
+.stats div{padding:14px 12px;border-radius:14px;border:1px solid var(--line);background:rgba(30,36,80,.28);text-align:center}
+.stats b{display:block;font-family:'Orbitron';font-size:22px;color:#fff}
+.stats span{font-size:10.5px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:11.5px;letter-spacing:.5px;padding:5px 12px;border-radius:20px;border:1px solid rgba(167,139,250,.35);color:#c4b5fd;background:rgba(124,100,250,.08)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.filters button{font-size:11px;letter-spacing:1px;padding:5px 12px;border-radius:20px;border:1px solid var(--line);color:#aeb6ff;transition:.2s}
+.filters button:hover{color:#fff}
+.filters button.on{color:#03111f;background:var(--cyan);border-color:var(--cyan)}
+.filters button em{font-style:normal;opacity:.6;margin-left:4px}
+
+.repo{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 16px;margin:8px 0;border-radius:14px;
+  border:1px solid rgba(120,140,255,.16);background:rgba(30,36,80,.32);transition:.25s;text-decoration:none;color:inherit;width:100%;text-align:left}
+.repo:hover{border-color:var(--cyan);background:rgba(40,50,110,.5);transform:translateX(4px);box-shadow:0 0 20px rgba(110,240,255,.12)}
+.repo b{color:#fff;font-size:14px;font-weight:500}.repo span{color:#8f98cc;font-size:12px}
+.repo .lang{font-size:10px;letter-spacing:1px;color:var(--gold);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.repo .lang::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
+.repo[hidden]{display:none}
+
+.ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.big-cta,.ghost-cta{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-size:11px;letter-spacing:2px;padding:12px 22px;border-radius:30px;text-decoration:none;transition:.25s}
+.big-cta{color:#03111f;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 24px rgba(120,200,255,.35)}
+.big-cta:hover{transform:translateY(-2px);box-shadow:0 0 36px rgba(120,200,255,.6)}
+.ghost-cta{color:#cfd5ff;border:1px solid rgba(140,160,255,.35)}
+.ghost-cta:hover{color:#fff;border-color:var(--cyan);transform:translateY(-2px)}
+.copyrow{display:flex;gap:8px;align-items:center}
+.copyrow .repo{flex:1}
+.mini-btn{flex:none;height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--line);font-size:12px;color:#aeb6ff;transition:.2s}
+.mini-btn:hover{color:#fff;border-color:var(--cyan)}
+
+/* ---------- Command palette ---------- */
+#palette{position:fixed;inset:0;z-index:40;background:rgba(2,2,12,.55);backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:flex-start;padding:12vh 16px 16px}
+#palette[hidden]{display:none}
+.pal{width:min(600px,100%);border-radius:18px;overflow:hidden;background:linear-gradient(160deg,rgba(16,18,52,.97),rgba(8,10,30,.97));border:1px solid rgba(140,160,255,.28);box-shadow:0 30px 90px rgba(0,0,0,.6);animation:pop .25s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(-8px) scale(.98)}}
+.pal input{width:100%;padding:18px 20px;background:none;border:none;border-bottom:1px solid var(--line);color:#fff;font:inherit;font-size:16px;outline:none}
+.pal input::placeholder{color:#6a72a6}
+#palList{max-height:min(52vh,420px);overflow-y:auto;padding:6px}
+.pitem{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:11px;text-align:left}
+.pitem.sel{background:rgba(111,242,255,.1);box-shadow:inset 0 0 0 1px rgba(111,242,255,.3)}
+.pitem .pt{flex:1;min-width:0}
+.pitem b{display:block;color:#fff;font-weight:500;font-size:14px}
+.pitem span{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pitem em{font-style:normal;font-size:10px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;white-space:nowrap}
+.pempty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+.palfoot{padding:10px 16px;border-top:1px solid var(--line);font-size:11px;color:#6a72a6;letter-spacing:.5px}
+
+/* ---------- Reader ---------- */
+#reader{position:fixed;inset:0;z-index:30;background:radial-gradient(1200px 600px at 70% -10%,rgba(80,70,200,.25),transparent),var(--bg0);display:flex;flex-direction:column;animation:fade .35s ease}
+#reader[hidden]{display:none}
+@keyframes fade{from{opacity:0}}
+.rbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 22px;border-bottom:1px solid var(--line)}
+.rnav{display:flex;gap:4px;flex-wrap:wrap}
+.rnav a{font-size:12px;color:#aeb6ff;text-decoration:none;padding:6px 10px;border-radius:9px}
+.rnav a:hover{color:#fff;background:rgba(120,140,255,.1)}
+#rbody{flex:1;overflow-y:auto;padding:30px 20px 80px;scroll-behavior:smooth}
+.rsec{max-width:760px;margin:0 auto 26px;padding:34px 36px;border-radius:22px;border:1px solid var(--line);background:rgba(12,14,40,.6)}
+
+#toast{position:fixed;z-index:50;left:50%;top:22px;transform:translate(-50%,-20px);opacity:0;padding:10px 18px;border-radius:12px;font-size:13px;transition:.35s var(--ease);pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+#loader{position:fixed;inset:0;z-index:99;background:var(--bg0);display:grid;place-items:center;transition:opacity .9s}
+#loader div{font-family:'Orbitron';letter-spacing:6px;color:var(--cyan);animation:pulse 1.4s infinite;font-size:13px}
+@keyframes pulse{50%{opacity:.35}}
+
+@media(max-width:1100px){#rail{display:none}}
+@media(max-width:760px){
+  #topbar{padding:12px 14px}
+  .tbtn .lbl,.tbtn kbd{display:none}
+  .tbtn{padding:0 11px}
+  #mapdock{display:none}
+  #nav{bottom:14px;bottom:max(14px,env(safe-area-inset-bottom))}
+  .navbtn:not(.active),.navsep{display:none}
+  .navbtn.active{min-width:150px;justify-content:center}
+  #hint{bottom:74px;font-size:10px}
+  #panel{top:auto;left:8px;right:8px;bottom:8px;width:auto;height:64vh;transform:translateY(calc(100% + 20px))}
+  #pscroll{padding:28px 20px 20px}
+  body.panel-open #nav{opacity:0;pointer-events:none}
+  .rsec{padding:26px 20px}
+  .rnav{display:none}
+  .stats b{font-size:18px}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<canvas id="space" aria-hidden="true"></canvas>
+<div id="loader"><div>ENTERING ORBIT…</div></div>
+
+<header class="hud" id="topbar">
+  <div class="brand" data-go="home" role="button" tabindex="0">MAYASKARA BHAT<small>CS @ RVCE · PORTFOLIO</small></div>
+  <div class="tools">
+    <button class="tbtn glass" data-action="palette" title="Search (Ctrl+K)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="lbl">Search</span><kbd>Ctrl K</kbd></button>
+    <button class="tbtn glass" data-action="reader" title="Read everything as a page"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg><span class="lbl">Read mode</span></button>
+    <a class="tbtn primary" id="resumeBtn" download title="Download résumé"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg><span class="lbl">Résumé</span></a>
+  </div>
+</header>
+
+<nav class="hud glass" id="nav" aria-label="Sectors">
+  <button class="navarrow" data-step="-1" aria-label="Previous sector">‹</button>
+  <span class="navsep"></span>
+  <div id="navbtns" style="display:flex;gap:4px"></div>
+  <span class="navsep"></span>
+  <button class="navarrow" data-step="1" aria-label="Next sector">›</button>
+</nav>
+
+<div class="hud glass" id="hint"></div>
+
+<div class="hud glass" id="mapdock">
+  <canvas id="minimap" aria-label="Minimap — click to travel"></canvas>
+  <div class="zoomrow">
+    <button data-zoom="-1" aria-label="Zoom out">−</button>
+    <span id="zoomlvl">100%</span>
+    <button data-zoom="1" aria-label="Zoom in">+</button>
+    <button data-zoom="0" aria-label="Recenter" title="Recenter (0)">⌖</button>
+  </div>
+</div>
+
+<div class="hud" id="rail">
+  <a href="https://github.com/Mayaskara25" target="_blank" rel="noopener" title="GitHub"><svg viewBox="0 0 24 24"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg></a>
+  <a href="https://linkedin.com/in/mayaskara-bhat-391b06374" target="_blank" rel="noopener" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.4 20.4h-3.5v-5.6c0-1.3 0-3-1.9-3s-2.1 1.4-2.1 2.9v5.7H9.4V9h3.4v1.6h.1c.5-.9 1.6-1.9 3.4-1.9 3.6 0 4.2 2.4 4.2 5.4zM5.3 7.4a2 2 0 1 1 0-4.1 2 2 0 0 1 0 4.1zM7.1 20.4H3.6V9h3.5z"/></svg></a>
+  <button data-action="copy-email" title="Copy email"><svg viewBox="0 0 24 24"><path d="M2 4h20v16H2zm2 2v.5l8 5.5 8-5.5V6H4zm16 12V9.2l-8 5.4-8-5.4V18z"/></svg></button>
+</div>
+
+<div id="tip" class="glass"></div>
+
+<aside id="panel" aria-hidden="true">
+  <button id="close" aria-label="Close panel">✕</button>
+  <div id="pscroll" tabindex="-1"></div>
+  <div id="pfoot"></div>
+</aside>
+
+<div id="palette" hidden role="dialog" aria-label="Search">
+  <div class="pal">
+    <input id="palIn" placeholder="Jump to a section, project, role or action…" autocomplete="off" spellcheck="false">
+    <div id="palList" role="listbox"></div>
+    <div class="palfoot">↑ ↓ to navigate · Enter to open · Esc to close</div>
+  </div>
+</div>
+
+<div id="reader" hidden>
+  <div class="rbar">
+    <div class="brand">MAYASKARA BHAT</div>
+    <div class="rnav" id="rnav"></div>
+    <button class="tbtn glass" id="rclose">Back to space ✕</button>
+  </div>
+  <div id="rbody"></div>
+</div>
+
+<div id="toast" class="glass"></div>
+
+<script>
+/* =====================================================================
+   DATA
+   ===================================================================== */
+const GITHUB="https://github.com/Mayaskara25";
+const LINKEDIN="https://linkedin.com/in/mayaskara-bhat-391b06374";
+const EMAIL="mayaskaraone1@gmail.com";
+const PHONE="+91 8660255264";
+const RESUME="Mayaskara_Bhat_Resume.pdf";
+
+const repos=[
+ ["C-neural-network","A neural network library written from scratch in C","C"],
+ ["lectov","Generating animations from lecture notes","Python"],
+ ["Ml_for_temp_correction","ML pipeline for temperature correction","Python"],
+ ["voice","Voice tooling experiments","C"],
+ ["flash-sim","Simulation built in Python","Python"],
+ ["qm","Quantum mechanics computations in C","C"],
+ ["drowsy","Drowsiness detection app","Kotlin"],
+ ["sih","Smart India Hackathon build","Python"],
+ ["sih2","Smart India Hackathon — iteration 2","Python"],
+ ["pcb","PCB design & documentation site","HTML"],
+ ["CamMonitor","Camera monitoring dashboard","HTML"],
+ ["keaDashboard","Kotlin + TypeScript dashboard","TypeScript"],
+ ["microui","A tiny immediate-mode UI library","—"],
+ ["justcode","TypeScript playground / utilities","TypeScript"],
+ ["Ppbl","C systems work","C"]
+];
+const LANG_COLOR={C:"#a8b9cc",Python:"#ffd97a",Kotlin:"#c4a7ff",TypeScript:"#6fb3ff",HTML:"#ff9a6f","—":"#8b93c9"};
+
+const EXP=[
+ {k:"vaidanth",org:"Vaidanth",role:"Customer-Side Engineering & Business Development",meta:"Team of 3 · with the founder & a dentist",pts:[
+   "Observed dental treatment procedures first-hand at RV Dental College; found that inspection + software logging took two people — added voice entry to the ERP so one doctor can do both.",
+   "Built the ERP demo and AI-assisted automations that pair LLM reasoning with a deterministic layer.",
+   "Designing a stock-and-price comparison marketplace for clinic reorders (in talks with DentMedHub & local distributors).",
+   "Exploring logistics gaps between clinics, labs and distributors; planning an order-tracking / lab-recommendation platform after customer visits to Confident Dental Labs."]},
+ {k:"vidyuth",org:"VidyuthLabs",role:"Business & Startup Operations",meta:"Team of 6",pts:[
+   "Building portable electrochemical sensors for food & water testing.",
+   "Customer discovery and commercialisation — researching customers, use cases and market-entry routes.",
+   "Stakeholder outreach and product positioning."]},
+ {k:"tedx",org:"TEDx RVCE",role:"Head of Marketing",meta:"~120 attendees",pts:[
+   "Led marketing, promotion, communications and audience outreach for the event."]},
+ {k:"ecell",org:"E-Cell, RVCE",role:"Events & Entrepreneurship",meta:"22 startups",pts:[
+   "Lead organizer of a startup event with 22 participating startups, evaluated by an industry jury."]}
+];
+
+const SKILLS=[
+ {k:"ai",name:"AI & Automation",items:["LLM Workflows","AI Agents","Workflow Automation","Prompt Engineering","Deterministic AI Workflows","ChatGPT","Claude"]},
+ {k:"growth",name:"Startup & Growth",items:["Customer Discovery","B2B Outreach","Lead Generation","Market Research","Competitor Research","Product-Market Fit","Business Development"]},
+ {k:"tech",name:"Technical",items:["Python","C/C++","ML Fundamentals","GitHub","Systems Fundamentals"]},
+ {k:"comm",name:"Communication",items:["Customer Interviews","Public Speaking","Stakeholder Coordination","Event Marketing","Debate"]}
+];
+
+const TOUR=["home","about","projects","experience","skills","contact"];
+const SECTORS={
+ home:      {x:0,    y:0,    R:60,hue:195,title:"MAYASKARA BHAT",name:"Home",      sub:"CS @ RVCE · Startup ops · AI automation",bands:true},
+ about:     {x:-1500,y:-700, R:44,hue:262,title:"ABOUT",         name:"About",     sub:"Who orbits here"},
+ projects:  {x:1550, y:-950, R:52,hue:205,title:"PROJECTS",      name:"Projects",  sub:"Constellations of code",ring:true,bands:true},
+ experience:{x:1500, y:1050, R:48,hue:325,title:"EXPERIENCE",    name:"Experience",sub:"Missions flown"},
+ skills:    {x:-1550,y:1000, R:46,hue:42, title:"SKILLS",        name:"Skills",    sub:"Systems powered up",ring:true},
+ contact:   {x:0,    y:1900, R:42,hue:165,title:"CONTACT",       name:"Contact",   sub:"Open a channel",bands:true}
+};
+
+/* moons orbiting each planet — every one is clickable */
+const MOONS={
+ home:[
+  {label:"GitHub",href:GITHUB,hint:"Opens GitHub profile"},
+  {label:"LinkedIn",href:LINKEDIN,hint:"Opens LinkedIn profile"},
+  {label:"Email",action:()=>copyEmail(),hint:"Copy email address"},
+  {label:"Résumé",href:RESUME,hint:"Download PDF résumé"}],
+ about:[
+  {label:"Profile",k:"profile"},{label:"Education",k:"edu"},{label:"Debate Society",k:"beyond"}],
+ projects:[{label:"Circularity Exchange",k:"highlight",hint:"Hackathon highlight"},
+  ...repos.slice(0,9).map((r,i)=>({label:r[0],repo:i,hint:r[1]}))],
+ experience:EXP.map(e=>({label:e.org,k:e.k,hint:e.role})),
+ skills:SKILLS.map(s=>({label:s.name,k:s.k,hint:s.items.slice(0,3).join(" · ")+"…"})),
+ contact:[
+  {label:"Email",href:"mailto:"+EMAIL,hint:EMAIL},{label:"GitHub",href:GITHUB,hint:"github.com/Mayaskara25"},
+  {label:"LinkedIn",href:LINKEDIN,hint:"mayaskara-bhat"},{label:"Phone",href:"tel:"+PHONE.replace(/\s/g,""),hint:PHONE}]
+};
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const mod=(a,b)=>((a%b)+b)%b;
+const easeIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isDesktop=()=>innerWidth>760;
+let rng=1337;const rand=()=>(rng=(rng*16807)%2147483647)/2147483647; // seeded so the sky is the same every visit
+
+/* build moon orbits */
+const allMoons=[];
+for(const id of TOUR){
+  const s=SECTORS[id],list=MOONS[id],n=list.length,rings=n>6?3:n>3?2:1;
+  list.forEach((m,i)=>{
+    const ring=i%rings;
+    Object.assign(m,{sid:id,ring,r:s.R+78+ring*58,a:(i/n)*Math.PI*2+rand()*.3,w:(.11-ring*.025)*(RM?.25:1),size:4+rand()*2});
+    if(!m.hint)m.hint=m.k?"Open details":"";
+    allMoons.push(m);
+  });
+  s.outer=s.R+78+(rings-1)*58;s.ext=s.outer+70;
+}
+
+/* =====================================================================
+   CANVAS + CAMERA
+   ===================================================================== */
+const cv=$("#space"),ctx=cv.getContext("2d");
+let W,H,DPR,bgGrad;
+function resize(){
+  DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
+  cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+"px";cv.style.height=H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  bgGrad=ctx.createLinearGradient(0,0,0,H);
+  bgGrad.addColorStop(0,"#03030f");bgGrad.addColorStop(.6,"#05051c");bgGrad.addColorStop(1,"#0a0628");
+}
+resize();addEventListener("resize",resize);
+
+const ZMIN=.28,ZMAX=2.2;
+const cam={x:0,y:500,z:.3,vx:0,vy:0};
+let current="home",flight=null,t=0;
+const view={ox:0,oy:0};          // eased screen offset so the planet stays visible beside the panel
+function viewCenter(){return[(W-view.ox)/2,(H-view.oy)/2+(view.oy>0?24:0)];}
+function toScreen(x,y){const[cx,cy]=viewCenter();return[(x-cam.x)*cam.z+cx,(y-cam.y)*cam.z+cy];}
+function toWorld(x,y){const[cx,cy]=viewCenter();return[(x-cx)/cam.z+cam.x,(y-cy)/cam.z+cam.y];}
+
+function panelSize(){const p=$("#panel");return isDesktop()?p.offsetWidth+12:p.offsetHeight+8;}
+function fitZoom(id,withPanel){
+  const e=SECTORS[id].ext;let aw=W-80,ah=H-200;
+  if(withPanel){if(isDesktop())aw-=panelSize();else ah=H-panelSize()-90;}
+  return clamp(Math.min(aw/(e*2),ah/(e*1.24+90)),ZMIN,1.25);
+}
+
+/* cinematic flight: eased path + zoom-out arc proportional to distance */
+function flyToPoint(x,y,z,opts={}){
+  const dist=Math.hypot(x-cam.x,y-cam.y);
+  flight={x0:cam.x,y0:cam.y,z0:cam.z,x1:x,y1:y,z1:clamp(z,ZMIN,ZMAX),t0:performance.now(),
+    d:RM?1:(opts.d||clamp(650+dist*.42,550,2000)),arc:RM?0:clamp(dist/5200,0,.48),then:opts.then,fired:false};
+  cam.vx=cam.vy=0;
+}
+function cancelFlight(){if(flight){flight=null;}}
+
+function flyTo(id,opts={}){
+  const s=SECTORS[id];
+  const willOpen=!!(opts.open||opts.then);
+  if(!willOpen&&panelOpen)closePanel();
+  setCurrent(id);
+  const then=opts.then||(opts.open?()=>showSector(id,opts.k):null);
+  const z=fitZoom(id,willOpen);
+  // already there → just do the thing
+  if(Math.hypot(s.x-cam.x,s.y-cam.y)<20&&Math.abs(cam.z-z)<.03&&!flight){then&&then();return;}
+  flyToPoint(s.x,s.y,z,{then});
+}
+const stepSector=dir=>flyTo(TOUR[mod(TOUR.indexOf(current)+dir,TOUR.length)],{open:panelOpen});
+function zoomAt(px,py,f){
+  cancelFlight();
+  const[wx,wy]=toWorld(px,py);cam.z=clamp(cam.z*f,ZMIN,ZMAX);
+  const[cx,cy]=viewCenter();cam.x=wx-(px-cx)/cam.z;cam.y=wy-(py-cy)/cam.z;
+}
+const zoomBy=f=>flyToPoint(cam.x,cam.y,cam.z*f,{d:320});
+
+/* =====================================================================
+   SKY: stars, nebulae, sprites
+   ===================================================================== */
+const glowCache=new Map();
+function glow(h,s=100,l=68){
+  const key=h+"/"+s+"/"+l;let c=glowCache.get(key);if(c)return c;
+  c=document.createElement("canvas");c.width=c.height=128;const g=c.getContext("2d");
+  const rg=g.createRadialGradient(64,64,0,64,64,64);
+  rg.addColorStop(0,`hsla(${h},${s}%,${Math.min(95,l+20)}%,1)`);rg.addColorStop(.22,`hsla(${h},${s}%,${l}%,.42)`);
+  rg.addColorStop(.6,`hsla(${h},${s}%,${l}%,.08)`);rg.addColorStop(1,`hsla(${h},${s}%,${l}%,0)`);
+  g.fillStyle=rg;g.fillRect(0,0,128,128);glowCache.set(key,c);return c;
+}
+function nebulaSprite(h){
+  const c=document.createElement("canvas");c.width=c.height=512;const g=c.getContext("2d");
+  g.globalCompositeOperation="lighter";
+  for(let i=0;i<9;i++){
+    const x=256+(rand()-.5)*240,y=256+(rand()-.5)*240,r=90+rand()*150,hh=h+(rand()-.5)*50;
+    const rg=g.createRadialGradient(x,y,0,x,y,r);
+    rg.addColorStop(0,`hsla(${hh},85%,55%,.045)`);rg.addColorStop(1,`hsla(${hh},90%,55%,0)`);
+    g.fillStyle=rg;g.fillRect(0,0,512,512);
+  }
+  return c;
+}
+const nebulae=[[-900,-1300,1500,262],[1700,-700,1700,210],[1300,1500,1500,325],[-1900,700,1600,40],[100,2300,1400,165],[0,200,1300,200]]
+  .map(([x,y,r,h])=>({x,y,r,img:nebulaSprite(h)}));
+
+const LAYERS=[{n:420,f:.06,r:[.3,.9]},{n:240,f:.16,r:[.5,1.3]},{n:90,f:.34,r:[.9,2]}];
+const stars=[];
+LAYERS.forEach((L,l)=>{for(let i=0;i<L.n;i++){const c=rand();stars.push({u:rand(),v:rand(),l,r:lerp(L.r[0],L.r[1],rand()),
+  tw:rand()*6.28,ts:.6+rand()*2,c:c<.08?"255,217,122":c<.16?"127,240,255":c<.22?"255,160,220":"215,222,255"});}});
+
+const meteors=[];
+if(!RM)setInterval(()=>{if(!document.hidden&&Math.random()<.55){const a=Math.PI*(.15+Math.random()*.25)*(Math.random()<.5?1:3);
+  meteors.push({x:Math.random()*W,y:Math.random()*H*.6,vx:Math.cos(a)*900,vy:Math.sin(a)*900,life:1});}},2200);
+
+/* =====================================================================
+   INPUT
+   ===================================================================== */
+const ptrs=new Map();let drag=null,pinch=null,mouse=null,hover=null,interacted=false;
+function firstInteraction(){if(!interacted){interacted=true;$("#hint").classList.add("gone");}}
+
+cv.addEventListener("pointerdown",e=>{
+  cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===1)drag={sx:e.clientX,sy:e.clientY,lx:e.clientX,ly:e.clientY,lt:performance.now(),moved:false,vx:0,vy:0,type:e.pointerType};
+  else if(ptrs.size===2){const[a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),mx:(a.x+b.x)/2,my:(a.y+b.y)/2};if(drag)drag.moved=true;}
+});
+cv.addEventListener("pointermove",e=>{
+  if(e.pointerType==="mouse")mouse={x:e.clientX,y:e.clientY};
+  if(!ptrs.has(e.pointerId))return;
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pinch&&ptrs.size>=2){
+    const[a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    zoomAt(mx,my,d/pinch.d);cam.x-=(mx-pinch.mx)/cam.z;cam.y-=(my-pinch.my)/cam.z;pinch={d,mx,my};firstInteraction();return;
+  }
+  if(!drag)return;
+  const now=performance.now(),dx=e.clientX-drag.lx,dy=e.clientY-drag.ly;
+  if(!drag.moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>6){drag.moved=true;cancelFlight();cv.classList.add("grabbing");firstInteraction();}
+  if(drag.moved){
+    cam.x-=dx/cam.z;cam.y-=dy/cam.z;cam.vx=cam.vy=0;
+    const s=Math.max(.008,(now-drag.lt)/1000);
+    drag.vx=lerp(drag.vx,-dx/cam.z/s,.35);drag.vy=lerp(drag.vy,-dy/cam.z/s,.35);
+  }
+  drag.lx=e.clientX;drag.ly=e.clientY;drag.lt=now;
+});
+function endPtr(e,cancel){
+  ptrs.delete(e.pointerId);
+  if(ptrs.size<2)pinch=null;
+  if(ptrs.size===1){const p=[...ptrs.values()][0];drag={sx:p.x,sy:p.y,lx:p.x,ly:p.y,lt:performance.now(),moved:true,vx:0,vy:0};return;}
+  if(ptrs.size===0&&drag){
+    if(drag.moved){
+      if(performance.now()-drag.lt<90){const max=3200/cam.z;cam.vx=clamp(drag.vx,-max,max);cam.vy=clamp(drag.vy,-max,max);} // fling
+    }else if(!cancel)handleClick(e.clientX,e.clientY);
+    drag=null;cv.classList.remove("grabbing");
+  }
+}
+cv.addEventListener("pointerup",e=>endPtr(e,false));
+cv.addEventListener("pointercancel",e=>endPtr(e,true));
+cv.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse"){mouse=null;setHover(null);}});
+
+/* wheel: scroll = travel between sectors · ctrl/⌘/shift/pinch = zoom */
+let wheelAcc=0,wheelLock=0;
+cv.addEventListener("wheel",e=>{
+  e.preventDefault();firstInteraction();
+  const unit=e.deltaMode===1?16:e.deltaMode===2?H:1,dy=(e.deltaY||e.deltaX)*unit;
+  if(e.ctrlKey||e.metaKey||e.shiftKey){zoomAt(e.clientX,e.clientY,Math.exp(-dy*(e.ctrlKey?.01:.0018)));return;}
+  const now=performance.now();
+  if(now<wheelLock){wheelAcc=0;return;}
+  wheelAcc+=dy;
+  if(Math.abs(wheelAcc)>60){stepSector(Math.sign(wheelAcc));wheelAcc=0;wheelLock=now+(RM?300:950);}
+},{passive:false});
+
+const keys={};
+const THRUST={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
+addEventListener("keydown",e=>{
+  const k=e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&k==="k"){e.preventDefault();paletteOpen?closePalette():openPalette();return;}
+  if(k==="escape"){if(paletteOpen)closePalette();else if(!$("#reader").hidden)closeReader();else if(panelOpen)closePanel();return;}
+  if(paletteOpen||!$("#reader").hidden||e.target.matches("input,textarea")||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(k==="/"){e.preventDefault();openPalette();return;}
+  if(/^[1-6]$/.test(k)){flyTo(TOUR[+k-1],{open:panelOpen});return;}
+  if(k==="n"||k==="]"||k==="pagedown"){e.preventDefault();stepSector(1);return;}
+  if(k==="p"||k==="["||k==="pageup"){e.preventDefault();stepSector(-1);return;}
+  if(k==="+"||k==="="){zoomBy(1.35);return;}
+  if(k==="-"||k==="_"){zoomBy(1/1.35);return;}
+  if(k==="0"){flyTo(current,{open:panelOpen});return;}
+  if((k==="enter"||k===" ")&&e.target===document.body&&!panelOpen){e.preventDefault();flyTo(current,{open:true});return;}
+  if(THRUST[k]&&!panelOpen){e.preventDefault();keys[k]=true;cancelFlight();firstInteraction();}
+});
+addEventListener("keyup",e=>{delete keys[e.key.toLowerCase()];});
+addEventListener("blur",()=>{for(const k in keys)delete keys[k];});
+
+/* picking */
+function pick(px,py){
+  let best=null,bd=1e9;
+  for(const m of allMoons){if(!m.vis)continue;const d=Math.hypot(px-m.sx,py-m.sy);if(d<Math.max(16,12*cam.z)&&d<bd){bd=d;best={type:"moon",m};}}
+  if(best)return best;
+  for(const id of TOUR){const s=SECTORS[id],[sx,sy]=toScreen(s.x,s.y);if(Math.hypot(px-sx,py-sy)<s.R*cam.z+14)return{type:"planet",id};}
+  return null;
+}
+function setHover(h){
+  hover=h;const tip=$("#tip");
+  cv.classList.toggle("pointer",!!h);
+  if(!h||!mouse){tip.classList.remove("show");return;}
+  if(h.type==="moon"){tip.innerHTML=`<b>${h.m.label}</b><span>${h.m.hint}</span>`;}
+  else{const s=SECTORS[h.id];tip.innerHTML=`<b>${s.name}</b><span>${s.sub} · click to open</span>`;}
+  tip.style.left=Math.min(mouse.x+16,W-tip.offsetWidth-10)+"px";tip.style.top=(mouse.y+18)+"px";tip.classList.add("show");
+}
+function handleClick(px,py){
+  firstInteraction();
+  const h=pick(px,py);
+  if(!h){if(panelOpen)closePanel();return;}
+  if(h.type==="planet")flyTo(h.id,{open:true});
+  else activateMoon(h.m);
+}
+function activateMoon(m){
+  if(m.href){if(m.href.startsWith("http"))window.open(m.href,"_blank","noopener");else location.href=m.href;}
+  else if(m.action)m.action();
+  else if(m.repo!=null)openRepo(m.repo);
+  else openSector(m.sid,m.k);
+}
+
+/* =====================================================================
+   UPDATE + RENDER
+   ===================================================================== */
+let last=performance.now(),prevCam={x:cam.x,y:cam.y},orbitSpeed=1,settleTimer=0;
+
+function update(dt,now){
+  // panel offset easing
+  const target=panelOpen?panelSize():0,ef=1-Math.exp(-9*dt);
+  if(isDesktop()){view.ox+= (target-view.ox)*ef;view.oy+=(0-view.oy)*ef;}else{view.oy+=(target-view.oy)*ef;view.ox+=(0-view.ox)*ef;}
+
+  if(flight){
+    const p=clamp((now-flight.t0)/flight.d,0,1),e=easeIO(p);
+    cam.x=lerp(flight.x0,flight.x1,e);cam.y=lerp(flight.y0,flight.y1,e);
+    cam.z=lerp(flight.z0,flight.z1,e)*(1-flight.arc*Math.sin(Math.PI*e));
+    if(!flight.fired&&p>.55){flight.fired=true;flight.then&&flight.then();}
+    if(p>=1)flight=null;
+  }else{
+    let ax=0,ay=0;for(const k in keys){const v=THRUST[k];if(v){ax+=v[0];ay+=v[1];}}
+    if(ax||ay){const n=Math.hypot(ax,ay),acc=3400/cam.z;cam.vx+=ax/n*acc*dt;cam.vy+=ay/n*acc*dt;}
+    if(!drag){
+      const max=2600/cam.z,sp=Math.hypot(cam.vx,cam.vy);if(sp>max){cam.vx*=max/sp;cam.vy*=max/sp;}
+      cam.x+=cam.vx*dt;cam.y+=cam.vy*dt;
+      const fr=Math.exp(-(ax||ay?2.2:3.4)*dt);cam.vx*=fr;cam.vy*=fr;
+      // soft world bounds
+      const bx=2600,by0=-1900,by1=2900;
+      if(cam.x<-bx)cam.vx+=(-bx-cam.x)*6*dt;if(cam.x>bx)cam.vx+=(bx-cam.x)*6*dt;
+      if(cam.y<by0)cam.vy+=(by0-cam.y)*6*dt;if(cam.y>by1)cam.vy+=(by1-cam.y)*6*dt;
+    }
+    // while drifting, the nearest planet becomes the current sector
+    if((settleTimer+=dt)>.25){settleTimer=0;
+      let bid=null,bd=1e9;for(const id of TOUR){const s=SECTORS[id],d=Math.hypot(s.x-cam.x,s.y-cam.y);if(d<bd){bd=d;bid=id;}}
+      if(bd<650&&bid!==current)setCurrent(bid);
+    }
+  }
+  // moons slow down under the cursor so they're easy to click
+  orbitSpeed=lerp(orbitSpeed,hover?.12:1,1-Math.exp(-6*dt));
+  for(const m of allMoons)m.a+=m.w*dt*orbitSpeed;
+  $("#zoomlvl").textContent=Math.round(cam.z*100)+"%";
+}
+
+function render(dt){
+  ctx.globalCompositeOperation="source-over";ctx.globalAlpha=1;
+  ctx.fillStyle=bgGrad;ctx.fillRect(0,0,W,H);
+  const[cx,cy]=viewCenter();
+  const cvx=(cam.x-prevCam.x)/Math.max(dt,.001),cvy=(cam.y-prevCam.y)/Math.max(dt,.001);
+  prevCam={x:cam.x,y:cam.y};
+
+  /* nebulae (parallax) */
+  ctx.globalCompositeOperation="lighter";
+  const zn=Math.sqrt(cam.z);
+  for(const n of nebulae){
+    const f=.5,sx=cx+(n.x-cam.x)*f*zn,sy=cy+(n.y-cam.y)*f*zn,r=n.r*zn;
+    if(sx+r<0||sx-r>W||sy+r<0||sy-r>H)continue;
+    ctx.globalAlpha=.9;ctx.drawImage(n.img,sx-r,sy-r,r*2,r*2);
+  }
+
+  /* stars with warp streaks when moving fast */
+  const Wr=W+200,Hr=H+200,zs=.75+.25*cam.z;
+  ctx.lineCap="round";
+  for(const s of stars){
+    const L=LAYERS[s.l],px=mod(s.u*Wr-cam.x*L.f*zs,Wr)-100,py=mod(s.v*Hr-cam.y*L.f*zs,Hr)-100;
+    const tw=.55+.45*Math.sin(t*s.ts+s.tw),a=(.25+.75*tw)*(.45+s.l*.28),r=s.r*(.85+.15*cam.z);
+    const lx=RM?0:clamp(-cvx*L.f*zs*.05,-160,160),ly=RM?0:clamp(-cvy*L.f*zs*.05,-160,160);
+    if(Math.abs(lx)+Math.abs(ly)>2.5){
+      ctx.strokeStyle=`rgba(${s.c},${a})`;ctx.lineWidth=r*1.3;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+lx,py+ly);ctx.stroke();
+    }else if(r<1){ctx.fillStyle=`rgba(${s.c},${a})`;ctx.fillRect(px,py,r*1.6,r*1.6);}
+    else{ctx.fillStyle=`rgba(${s.c},${a})`;ctx.beginPath();ctx.arc(px,py,r,0,6.283);ctx.fill();
+      if(r>1.5){ctx.globalAlpha=a*.5;ctx.drawImage(glow(220,60,80),px-r*5,py-r*5,r*10,r*10);ctx.globalAlpha=1;}}
+  }
+
+  /* meteors */
+  for(let i=meteors.length-1;i>=0;i--){const m=meteors[i];
+    m.x+=m.vx*dt;m.y+=m.vy*dt;m.life-=dt*1.1;if(m.life<=0){meteors.splice(i,1);continue;}
+    const g=ctx.createLinearGradient(m.x,m.y,m.x-m.vx*.12,m.y-m.vy*.12);
+    g.addColorStop(0,`rgba(200,240,255,${m.life})`);g.addColorStop(1,"rgba(200,240,255,0)");
+    ctx.strokeStyle=g;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(m.x,m.y);ctx.lineTo(m.x-m.vx*.12,m.y-m.vy*.12);ctx.stroke();
+  }
+
+  /* travel route between sectors */
+  ctx.globalCompositeOperation="source-over";
+  ctx.setLineDash([3,11]);ctx.lineDashOffset=-t*18;ctx.lineWidth=1.2;ctx.strokeStyle="rgba(150,170,255,.2)";
+  ctx.beginPath();
+  TOUR.forEach((id,i)=>{const s=SECTORS[id],[x,y]=toScreen(s.x,s.y);
+    if(!i){ctx.moveTo(x,y);return;}
+    const p=SECTORS[TOUR[i-1]],[px,py]=toScreen(p.x,p.y),mx=(x+px)/2-(y-py)*.18,my=(y+py)/2+(x-px)*.18;
+    ctx.quadraticCurveTo(mx,my,x,y);});
+  ctx.stroke();ctx.setLineDash([]);
+
+  /* planets + moons (moons behind the planet drawn first for depth) */
+  const labels=[],titles=[];
+  for(const id of TOUR){
+    const s=SECTORS[id],[sx,sy]=toScreen(s.x,s.y),r=s.R*cam.z,reach=s.ext*cam.z+60;
+    const moons=MOONS[id];
+    if(sx<-reach||sx>W+reach||sy<-reach||sy>H+reach){moons.forEach(m=>m.vis=false);continue;}
+    const active=id===current,hov=hover&&hover.type==="planet"&&hover.id===id;
+
+    // orbit paths
+    const rings=new Set(moons.map(m=>m.r));
+    ctx.lineWidth=1;
+    for(const rr of rings){ctx.strokeStyle=`hsla(${s.hue},80%,75%,${active?.16:.08})`;ctx.beginPath();ctx.ellipse(sx,sy,rr*cam.z,rr*cam.z*.62,0,0,6.283);ctx.stroke();}
+
+    for(const m of moons){m.sx=sx+Math.cos(m.a)*m.r*cam.z;m.sy=sy+Math.sin(m.a)*m.r*cam.z*.62;m.vis=true;}
+    moons.filter(m=>Math.sin(m.a)<0).forEach(m=>drawMoon(m,s,labels));
+    drawPlanet(s,sx,sy,r,active,hov);
+    moons.filter(m=>Math.sin(m.a)>=0).forEach(m=>drawMoon(m,s,labels));
+
+    titles.push({s,id,sx,sy:sy-s.outer*cam.z*.62-8});
+  }
+
+  /* moon labels on top */
+  ctx.textAlign="center";setFont("500 11px 'Space Grotesk'","0.5px");
+  for(const L of labels){
+    const w=ctx.measureText(L.text).width+16,x=L.x,y=L.y-L.off;
+    ctx.globalAlpha=L.a;
+    ctx.fillStyle=L.hot?"rgba(111,242,255,.18)":"rgba(8,10,30,.62)";
+    roundRect(x-w/2,y-11,w,20,10);ctx.fill();
+    ctx.strokeStyle=L.hot?"rgba(111,242,255,.7)":`hsla(${L.hue},80%,75%,.22)`;ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle=L.hot?"#fff":"rgba(215,222,255,.9)";ctx.fillText(L.text,x,y+3.5);
+  }
+  /* planet titles above everything, sitting just above the planet */
+  const la=clamp((cam.z-.25)*3,0,1);
+  if(la>0){
+    ctx.textAlign="center";ctx.shadowColor="rgba(0,0,10,.9)";ctx.shadowBlur=10;
+    for(const{s,id,sx,sy}of titles){
+      ctx.globalAlpha=la;
+      setFont("700 "+(id==="home"?15:14)+"px Orbitron","4px");
+      ctx.fillStyle=`hsl(${s.hue},95%,90%)`;ctx.fillText(s.title,sx,sy-36);
+      setFont("400 11.5px 'Space Grotesk'","1px");
+      ctx.fillStyle="rgba(190,198,240,.85)";ctx.fillText(s.sub,sx,sy-18);
+    }
+    ctx.shadowBlur=0;ctx.shadowColor="transparent";
+  }
+  ctx.globalAlpha=1;
+}
+
+function drawPlanet(s,sx,sy,r,active,hov){
+  const h=s.hue;
+  ctx.globalCompositeOperation="lighter";
+  ctx.globalAlpha=active?.42:.28;ctx.drawImage(glow(h,90,60),sx-r*3.6,sy-r*3.6,r*7.2,r*7.2);ctx.globalAlpha=1;
+  ctx.globalCompositeOperation="source-over";
+  const tilt=-.32;
+  if(s.ring)drawRing(sx,sy,r,h,tilt,Math.PI,2*Math.PI);
+  // body
+  const g=ctx.createRadialGradient(sx-r*.4,sy-r*.45,r*.08,sx,sy,r*1.05);
+  g.addColorStop(0,`hsl(${h},95%,88%)`);g.addColorStop(.45,`hsl(${h},70%,52%)`);g.addColorStop(1,`hsl(${h+25},60%,9%)`);
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(sx,sy,r,0,6.283);ctx.fill();
+  if(s.bands){
+    ctx.save();ctx.beginPath();ctx.arc(sx,sy,r,0,6.283);ctx.clip();
+    for(let k=-2;k<=2;k++){ctx.fillStyle=`hsla(${h+k*8},90%,${k%2?80:30}%,.09)`;
+      ctx.beginPath();ctx.ellipse(sx+Math.sin(t*.3+k)*r*.08,sy+k*r*.36,r*1.3,r*.11,.08,0,6.283);ctx.fill();}
+    ctx.restore();
+  }
+  // atmosphere rim
+  ctx.strokeStyle=`hsla(${h},100%,82%,.55)`;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(sx,sy,r+.5,0,6.283);ctx.stroke();
+  if(s.ring)drawRing(sx,sy,r,h,tilt,0,Math.PI);
+  // selection ring
+  if(active||hov){
+    ctx.setLineDash([4,7]);ctx.lineDashOffset=-t*14;ctx.lineWidth=1.3;
+    ctx.strokeStyle=`hsla(${h},100%,80%,${hov?.9:.45})`;ctx.beginPath();ctx.arc(sx,sy,r+12+Math.sin(t*2)*1.5,0,6.283);ctx.stroke();ctx.setLineDash([]);
+  }
+}
+function drawRing(sx,sy,r,h,tilt,a0,a1){
+  for(const[k,a,w]of[[2.05,.5,3],[1.75,.3,6],[1.5,.18,2]]){
+    ctx.strokeStyle=`hsla(${h},70%,80%,${a})`;ctx.lineWidth=w*cam.z;
+    ctx.beginPath();ctx.ellipse(sx,sy,r*k,r*k*.26,tilt,a0,a1);ctx.stroke();
+  }
+}
+function drawMoon(m,s,labels){
+  const hot=hover&&hover.type==="moon"&&hover.m===m;
+  const depth=.75+.25*Math.sin(m.a); // front moons are bigger/brighter
+  const sz=m.size*Math.sqrt(cam.z)*depth*(hot?1.5:1),h=s.hue+(m.repo!=null?(m.repo*9)%40-20:0);
+  ctx.globalCompositeOperation="lighter";
+  ctx.globalAlpha=(hot?.7:.35)*depth;ctx.drawImage(glow(h),m.sx-sz*5,m.sy-sz*5,sz*10,sz*10);
+  ctx.globalCompositeOperation="source-over";ctx.globalAlpha=1;
+  ctx.fillStyle=`hsl(${h},90%,${hot?92:78}%)`;ctx.beginPath();ctx.arc(m.sx,m.sy,sz,0,6.283);ctx.fill();
+  if(cam.z>.5||hot)labels.push({text:m.label,x:m.sx,y:m.sy,off:sz+16,a:hot?1:clamp((cam.z-.5)*4,0,1)*(.55+.45*depth),hot,hue:s.hue});
+}
+function setFont(f,ls){ctx.font=f;if("letterSpacing"in ctx)ctx.letterSpacing=ls;}
+function roundRect(x,y,w,h,r){ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x,y,w,h,r);else ctx.rect(x,y,w,h);}
+
+/* minimap */
+const mm=$("#minimap"),mctx=mm.getContext("2d");
+const MB={x0:-2100,y0:-1400,x1:2100,y1:2350};
+function mmScale(){const w=mm.clientWidth,h=mm.clientHeight,s=Math.min(w/(MB.x1-MB.x0),h/(MB.y1-MB.y0));
+  return{w,h,s,ox:(w-(MB.x1-MB.x0)*s)/2-MB.x0*s,oy:(h-(MB.y1-MB.y0)*s)/2-MB.y0*s};}
+function drawMini(){
+  if(!mm.offsetParent)return;
+  const{w,h,s,ox,oy}=mmScale();
+  if(mm.width!==w*DPR){mm.width=w*DPR;mm.height=h*DPR;}
+  mctx.setTransform(DPR,0,0,DPR,0,0);mctx.clearRect(0,0,w,h);
+  mctx.strokeStyle="rgba(150,170,255,.25)";mctx.setLineDash([2,3]);mctx.beginPath();
+  TOUR.forEach((id,i)=>{const p=SECTORS[id];i?mctx.lineTo(p.x*s+ox,p.y*s+oy):mctx.moveTo(p.x*s+ox,p.y*s+oy);});
+  mctx.stroke();mctx.setLineDash([]);
+  for(const id of TOUR){const p=SECTORS[id],x=p.x*s+ox,y=p.y*s+oy,a=id===current;
+    mctx.fillStyle=`hsl(${p.hue},90%,${a?80:62}%)`;mctx.beginPath();mctx.arc(x,y,a?4.5:3,0,6.283);mctx.fill();
+    if(a){mctx.strokeStyle=`hsla(${p.hue},90%,80%,.6)`;mctx.beginPath();mctx.arc(x,y,8,0,6.283);mctx.stroke();}}
+  const[a0,b0]=toWorld(0,0),[a1,b1]=toWorld(W-view.ox,H-view.oy);
+  mctx.strokeStyle="rgba(111,242,255,.8)";mctx.lineWidth=1;
+  mctx.strokeRect(a0*s+ox,b0*s+oy,(a1-a0)*s,(b1-b0)*s);
+}
+mm.addEventListener("click",e=>{
+  const{s,ox,oy}=mmScale(),r=mm.getBoundingClientRect(),wx=(e.clientX-r.left-ox)/s,wy=(e.clientY-r.top-oy)/s;
+  let bid=null,bd=1e9;for(const id of TOUR){const p=SECTORS[id],d=Math.hypot(p.x-wx,p.y-wy);if(d<bd){bd=d;bid=id;}}
+  firstInteraction();
+  if(bd<450)flyTo(bid,{open:panelOpen});else{if(panelOpen)closePanel();flyToPoint(wx,wy,cam.z);}
+});
+
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
+  update(dt,now);
+  if(mouse&&!drag)setHover(pick(mouse.x,mouse.y));
+  render(dt);drawMini();
+  requestAnimationFrame(frame);
+}
+
+/* =====================================================================
+   CONTENT
+   ===================================================================== */
+const chips=a=>`<div class="chips">${a.map(s=>`<span class="chip">${s}</span>`).join("")}</div>`;
+const repoRow=(r,i)=>`<a class="repo" data-l="${r[2]}" href="${GITHUB}/${r[0]}" target="_blank" rel="noopener"><div><b>${r[0]}</b><br><span>${r[1]}</span></div><div class="lang" style="color:${LANG_COLOR[r[2]]}">${r[2]}</div></a>`;
+function langFilters(){
+  const c={};repos.forEach(r=>c[r[2]]=(c[r[2]]||0)+1);
+  return `<div class="filters"><button class="on" data-lang="*">All<em>${repos.length}</em></button>${Object.keys(c).filter(l=>l!=="—").map(l=>`<button data-lang="${l}">${l}<em>${c[l]}</em></button>`).join("")}</div>`;
+}
+
+function sectionHTML(id){
+  switch(id){
+  case"home":return`
+    <div class="ptag">Welcome aboard</div><h2 class="ptitle">Mayaskara Bhat</h2>
+    <div class="psub">Startup Operations · AI Automation · Business Development</div>
+    <div class="stats"><div><b>9.78</b><span>CGPA · RVCE</span></div><div><b>${repos.length}</b><span>Repositories</span></div><div><b>${EXP.length}</b><span>Teams & roles</span></div></div>
+    <div class="pbody"><p>Computer Science student at RVCE who works inside early-stage teams — talking to business owners, finding their real operational problems, and turning them into product features and AI-driven automations.</p>
+    <p>Interested in AI agents, commerce and 0→1 execution.</p></div>
+    <div class="ctas"><button class="big-cta" data-go="projects">EXPLORE WORK →</button><a class="ghost-cta" href="${RESUME}" download>RÉSUMÉ ↓</a><button class="ghost-cta" data-action="reader">READ ALL</button></div>`;
+  case"about":return`
+    <div class="ptag">Sector 02 · About</div><h2 class="ptitle">About Me</h2><div class="psub">Bengaluru, India</div>
+    <div class="pbody">
+      <div class="block" data-k="profile"><h3 style="margin-top:0">Profile</h3><p>Computer Science student at RVCE with hands-on experience in startup operations, customer-facing engineering, marketing, events and business development. Keen on market research, lead generation, customer acquisition and commercial strategy.</p></div>
+      <div class="block" data-k="edu"><h3 style="margin-top:0">Education</h3><b>B.E. Computer Science & Engineering</b><div class="org">RV College of Engineering, Bengaluru</div><p>CGPA 9.78 · Expected August 2029</p></div>
+      <div class="block" data-k="beyond"><h3 style="margin-top:0">Beyond the classroom</h3><ul><li>Active Member, RVCE Debate Society — debate, research & public speaking</li><li>Active across the RVCE student ecosystem: entrepreneurship, technology & research</li></ul></div>
+    </div>`;
+  case"projects":return`
+    <div class="ptag">Sector 03 · Projects</div><h2 class="ptitle">Project Constellations</h2><div class="psub">Every moon is a repository — click one in space, or browse here</div>
+    <div class="pbody">
+      <div class="block" data-k="highlight"><h3 style="margin-top:0">Highlight · Hackathon</h3><b>Circularity Exchange</b><div class="org">Multi-agent system</div>
+      <p>Built a multi-agent system to fix coordination gaps in industrial by-product exchange — e.g. a steel producer's by-product meeting a coastal cement company's material need. Designed specialised agents that share requirements, availability and business context so matches are found earlier.</p>${chips(["AI Agents","Multi-agent","Industrial B2B"])}</div>
+      <h3>All repositories</h3>${langFilters()}
+      <div class="repos">${repos.map(repoRow).join("")}</div>
+    </div>
+    <div class="ctas"><a class="big-cta" href="${GITHUB}?tab=repositories" target="_blank" rel="noopener">GITHUB PROFILE →</a></div>`;
+  case"experience":return`
+    <div class="ptag">Sector 04 · Experience</div><h2 class="ptitle">Mission Log</h2><div class="psub">Where I've flown</div>
+    <div class="pbody">${EXP.map(e=>`<div class="block" data-k="${e.k}"><b>${e.role}</b><div class="org">${e.org} · ${e.meta}</div><ul>${e.pts.map(p=>`<li>${p}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  case"skills":return`
+    <div class="ptag">Sector 05 · Skills</div><h2 class="ptitle">Systems Online</h2><div class="psub">Core modules</div>
+    <div class="pbody">${SKILLS.map(s=>`<div class="block" data-k="${s.k}"><h3 style="margin-top:0">${s.name}</h3>${chips(s.items)}</div>`).join("")}</div>`;
+  case"contact":return`
+    <div class="ptag">Sector 06 · Contact</div><h2 class="ptitle">Open a Channel</h2><div class="psub">Bengaluru, India · signal always received</div>
+    <div class="pbody">
+      <div class="copyrow"><a class="repo" href="mailto:${EMAIL}"><div><b>Email</b><br><span>${EMAIL}</span></div><div class="lang" style="color:var(--cyan)">MAIL</div></a><button class="mini-btn" data-action="copy-email">Copy</button></div>
+      <a class="repo" href="tel:${PHONE.replace(/\s/g,"")}"><div><b>Phone</b><br><span>${PHONE}</span></div><div class="lang" style="color:var(--cyan)">CALL</div></a>
+      <a class="repo" href="${GITHUB}" target="_blank" rel="noopener"><div><b>GitHub</b><br><span>github.com/Mayaskara25</span></div><div class="lang" style="color:var(--cyan)">↗</div></a>
+      <a class="repo" href="${LINKEDIN}" target="_blank" rel="noopener"><div><b>LinkedIn</b><br><span>mayaskara-bhat</span></div><div class="lang" style="color:var(--cyan)">↗</div></a>
+    </div>
+    <div class="ctas"><a class="big-cta" href="mailto:${EMAIL}">SEND TRANSMISSION →</a><a class="ghost-cta" href="${RESUME}" download>RÉSUMÉ ↓</a></div>`;
+  }
+}
+
+/* =====================================================================
+   PANEL
+   ===================================================================== */
+const panel=$("#panel"),ps=$("#pscroll"),pf=$("#pfoot");
+let panelOpen=false;
+function showPanel(html,navId){
+  ps.innerHTML=html;ps.scrollTop=0;
+  const i=TOUR.indexOf(navId),p=TOUR[mod(i-1,6)],n=TOUR[mod(i+1,6)];
+  pf.innerHTML=`<button data-go="${p}" data-open>‹ ${SECTORS[p].name}</button><span>${String(i+1).padStart(2,"0")} / 06</span><button data-go="${n}" data-open>${SECTORS[n].name} ›</button>`;
+  panel.classList.add("open");panel.setAttribute("aria-hidden","false");document.body.classList.add("panel-open");
+  if(!panelOpen)ps.focus({preventScroll:true});
+  panelOpen=true;
+}
+function closePanel(){panel.classList.remove("open");panel.setAttribute("aria-hidden","true");document.body.classList.remove("panel-open");panelOpen=false;}
+$("#close").onclick=closePanel;
+
+function showSector(id,k){
+  showPanel(sectionHTML(id),id);
+  if(k){const el=ps.querySelector(`[data-k="${k}"]`);if(el){setTimeout(()=>{el.scrollIntoView({behavior:RM?"auto":"smooth",block:"center"});el.classList.add("hl");},250);}}
+}
+function nearSector(id){const s=SECTORS[id];return !flight&&Math.hypot(s.x-cam.x,s.y-cam.y)<120;}
+function openSector(id,k){if(nearSector(id)&&panelOpen===true){setCurrent(id);showSector(id,k);}else flyTo(id,{open:true,k});}
+function openRepo(i){flyTo("projects",{then:()=>showRepo(i)});}
+function showRepo(i){
+  const r=repos[i],same=repos.map((x,j)=>[x,j]).filter(([x,j])=>x[2]===r[2]&&j!==i);
+  showPanel(`<div class="ptag">Repository · ${r[2]}</div><h2 class="ptitle">${r[0]}</h2><div class="psub">${r[1]}</div>
+    <div class="pbody"><p>Part of the Mayaskara constellation on GitHub — open it to browse the source, README and commit history.</p>
+    ${same.length?`<h3>More in ${r[2]}</h3>${same.map(([x,j])=>`<button class="repo" data-repo="${j}"><div><b>${x[0]}</b><br><span>${x[1]}</span></div><div class="lang" style="color:${LANG_COLOR[x[2]]}">${x[2]}</div></button>`).join("")}`:""}</div>
+    <div class="ctas"><a class="big-cta" href="${GITHUB}/${r[0]}" target="_blank" rel="noopener">OPEN REPO →</a><button class="ghost-cta" data-go="projects" data-open>← ALL PROJECTS</button></div>`,"projects");
+}
+
+/* =====================================================================
+   NAV / UI STATE
+   ===================================================================== */
+$("#navbtns").innerHTML=TOUR.map((id,i)=>`<button class="navbtn" data-go="${id}"><i>${i+1}</i>${SECTORS[id].name.toUpperCase()}</button>`).join("");
+function setCurrent(id){
+  if(current===id&&document.querySelector(".navbtn.active"))return;
+  current=id;
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+  history.replaceState(null,"",id==="home"?location.pathname:"#"+id);
+}
+
+/* one delegated click handler for every data-* control on the page */
+document.addEventListener("click",e=>{
+  const el=e.target.closest("[data-go],[data-action],[data-step],[data-zoom],[data-lang],[data-repo]");
+  if(!el||el===cv)return;
+  if(el.dataset.lang){
+    const root=el.closest(".pbody"),l=el.dataset.lang;
+    root.querySelectorAll(".filters button").forEach(b=>b.classList.toggle("on",b===el));
+    root.querySelectorAll(".repo[data-l]").forEach(r=>r.hidden=l!=="*"&&r.dataset.l!==l);return;
+  }
+  firstInteraction();
+  if(el.dataset.repo){showRepo(+el.dataset.repo);return;}
+  if(el.dataset.go){const fromReader=!!el.closest("#reader");if(fromReader)closeReader();
+    flyTo(el.dataset.go,{open:el.hasAttribute("data-open")||panelOpen||fromReader});return;}
+  if(el.dataset.step){stepSector(+el.dataset.step);return;}
+  if(el.dataset.zoom){const z=+el.dataset.zoom;z?zoomBy(z>0?1.4:1/1.4):flyTo(current,{open:panelOpen});return;}
+  const a=el.dataset.action;
+  if(a==="reader")openReader();else if(a==="palette")openPalette();else if(a==="copy-email")copyEmail();
+});
+$(".brand").addEventListener("keydown",e=>{if(e.key==="Enter")flyTo("home");});
+$("#resumeBtn").href=RESUME;
+
+let toastT;
+function toast(msg){const el=$("#toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("show"),2200);}
+function copyEmail(){
+  (navigator.clipboard?navigator.clipboard.writeText(EMAIL):Promise.reject())
+    .then(()=>toast("Email copied — "+EMAIL)).catch(()=>{location.href="mailto:"+EMAIL;});
+}
+
+/* ---------- Reader (plain page of everything) ---------- */
+function openReader(){
+  closePalette();
+  $("#rnav").innerHTML=TOUR.map(id=>`<a href="#r-${id}" data-jump="${id}">${SECTORS[id].name}</a>`).join("");
+  $("#rbody").innerHTML=TOUR.map(id=>`<section class="rsec" id="r-${id}">${sectionHTML(id)}</section>`).join("");
+  $("#reader").hidden=false;$("#rbody").focus();
+}
+function closeReader(){$("#reader").hidden=true;}
+$("#rclose").onclick=closeReader;
+$("#rnav").addEventListener("click",e=>{const a=e.target.closest("[data-jump]");if(!a)return;e.preventDefault();$("#r-"+a.dataset.jump).scrollIntoView({behavior:"smooth"});});
+
+/* ---------- Command palette ---------- */
+let paletteOpen=false,palSel=0,palShown=[];
+const palItems=[
+  ...TOUR.map((id,i)=>({t:SECTORS[id].name,s:SECTORS[id].sub,tag:"Sector "+(i+1),run:()=>flyTo(id,{open:true})})),
+  ...repos.map((r,i)=>({t:r[0],s:r[1],tag:r[2],run:()=>openRepo(i)})),
+  {t:"Circularity Exchange",s:"Hackathon · multi-agent system",tag:"Project",run:()=>openSector("projects","highlight")},
+  ...EXP.map(e=>({t:e.org,s:e.role,tag:"Experience",run:()=>openSector("experience",e.k)})),
+  ...SKILLS.map(s=>({t:s.name,s:s.items.join(", "),tag:"Skills",run:()=>openSector("skills",s.k)})),
+  {t:"Download résumé",s:"PDF",tag:"Action",run:()=>{const a=document.createElement("a");a.href=RESUME;a.download="";a.click();}},
+  {t:"Copy email",s:EMAIL,tag:"Action",run:copyEmail},
+  {t:"Open GitHub",s:"github.com/Mayaskara25",tag:"Link",run:()=>window.open(GITHUB,"_blank","noopener")},
+  {t:"Open LinkedIn",s:"mayaskara-bhat",tag:"Link",run:()=>window.open(LINKEDIN,"_blank","noopener")},
+  {t:"Read mode",s:"Everything on one scrollable page",tag:"Action",run:openReader}
+];
+function renderPal(){
+  const q=$("#palIn").value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  palShown=palItems.filter(it=>{const h=(it.t+" "+it.s+" "+it.tag).toLowerCase();return q.every(w=>h.includes(w));});
+  palSel=clamp(palSel,0,Math.max(0,palShown.length-1));
+  $("#palList").innerHTML=palShown.length?palShown.map((it,i)=>`<button class="pitem${i===palSel?" sel":""}" data-i="${i}" role="option"><div class="pt"><b>${it.t}</b><span>${it.s}</span></div><em>${it.tag}</em></button>`).join("")
+    :`<div class="pempty">Nothing found in this galaxy.</div>`;
+  const sel=$("#palList .sel");sel&&sel.scrollIntoView({block:"nearest"});
+}
+function openPalette(){paletteOpen=true;$("#palette").hidden=false;$("#palIn").value="";palSel=0;renderPal();$("#palIn").focus();firstInteraction();}
+function closePalette(){paletteOpen=false;$("#palette").hidden=true;}
+function runPal(i){const it=palShown[i];if(!it)return;closePalette();if(!$("#reader").hidden&&it.run!==openReader)closeReader();it.run();}
+$("#palIn").addEventListener("input",()=>{palSel=0;renderPal();});
+$("#palIn").addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){e.preventDefault();palSel=(palSel+1)%Math.max(1,palShown.length);renderPal();}
+  else if(e.key==="ArrowUp"){e.preventDefault();palSel=mod(palSel-1,Math.max(1,palShown.length));renderPal();}
+  else if(e.key==="Enter"){e.preventDefault();runPal(palSel);}
+});
+$("#palList").addEventListener("click",e=>{const b=e.target.closest(".pitem");if(b)runPal(+b.dataset.i);});
+$("#palList").addEventListener("mousemove",e=>{const b=e.target.closest(".pitem");if(b&&+b.dataset.i!==palSel){palSel=+b.dataset.i;renderPal();}});
+$("#palette").addEventListener("click",e=>{if(e.target.id==="palette")closePalette();});
+
+/* hint adapts to the device */
+$("#hint").innerHTML=matchMedia("(pointer:coarse)").matches
+  ?"<b>Swipe</b> to drift · <b>Pinch</b> to zoom · <b>Tap</b> a planet"
+  :"<b>Scroll</b> to travel · <b>Drag</b> / <b>WASD</b> to drift · <b>Ctrl+Scroll</b> to zoom · <b>Click</b> a planet";
+setTimeout(()=>$("#hint").classList.add("gone"),12000);
+
+/* deep links (#projects etc.) */
+addEventListener("hashchange",()=>{const id=location.hash.slice(1);if(SECTORS[id]&&id!==current)flyTo(id,{open:true});});
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+requestAnimationFrame(frame);
+Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]).then(()=>{
+  const l=$("#loader");l.style.opacity=0;setTimeout(()=>l.remove(),900);
+  const id=location.hash.slice(1);
+  if(SECTORS[id]){current="";flyTo(id,{open:true});}
+  else{current="";setCurrent("home");flyToPoint(0,0,fitZoom("home",false),{d:RM?1:2200});}
+});
+</script>
+  <a class="fresh-five-back" href="../index.html#bar" aria-label="Back to The Fresh Five juice bar" style="position:fixed;left:16px;bottom:16px;z-index:9999;padding:10px 16px;border-radius:999px;background:#171e21;color:#f6efe0;font:600 12px/1 system-ui,sans-serif;letter-spacing:.08em;text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.3)">← THE FRESH FIVE</a>
+</body>
+</html>
