@@ -230,7 +230,14 @@
               <li>One shared benchmark measuring recovery after road and junction failures.</li>
             </ul>
             <aside class="sheet__spec">
-              <!-- route-demo -->
+              <div class="route">
+                <canvas id="route-cv" role="img" aria-label="Interactive road graph. Click a road to close it and the shortest route is recomputed."></canvas>
+                <div class="route__bar">
+                  <span id="route-read" aria-live="polite">ROUTE --</span>
+                  <button class="route__reset" id="route-reset" type="button">Reopen all</button>
+                </div>
+              </div>
+              <p class="route__note">Tap a road to close it. A toy Dijkstra reroute on a made-up grid; the real project runs on Bengaluru's OpenStreetMap network.</p>
               <p class="spec-label">Tools</p>
               <ul class="chips"><li>Python</li><li>OpenStreetMap</li><li>SUMO</li><li>Graph algorithms</li></ul>
             </aside>
@@ -239,10 +246,83 @@
       </div>
     </section>
 
+    <section class="sec wrap" id="built" aria-labelledby="built-title">
+      <header class="sec-head">
+        <span class="sec-num">03</span>
+        <h2 id="built-title">Also built</h2>
+        <span class="sec-tag">Parts bin</span>
+      </header>
+      <div class="sec-intro"><p>Smaller builds, hackathon work and projects in progress.</p></div>
+
+      <ul class="bin">
+        <li class="bin__row reveal">
+          <span class="bin__idx">A1</span>
+          <div class="bin__main">
+            <h3>Ghost Data Still Exists</h3>
+            <p>Built in 24 hours for HackerRank Orchestrate (October 2026): an agent that audits whether data a service says it deleted is actually gone.</p>
+          </div>
+          <div class="bin__meta">
+            <span class="status"><span class="led led--ok"></span> Hackathon entry, solo</span>
+            <span class="bin__badge">24 h</span>
+          </div>
+        </li>
+
+        <li class="bin__row reveal">
+          <span class="bin__idx">A2</span>
+          <div class="bin__main">
+            <h3>Drain health monitoring system</h3>
+            <p>An ESP32 with six sensors streaming to Firebase, plus a Streamlit dashboard that flags drains likely to block before they overflow.</p>
+            <ul class="chips"><li>ESP32</li><li>Firebase</li><li>Streamlit</li></ul>
+          </div>
+          <div class="bin__meta">
+            <span class="status"><span class="led led--ok"></span> Completed</span>
+            <span class="bin__badge">6 sensors</span>
+          </div>
+        </li>
+
+        <li class="bin__row bin__row--wide reveal">
+          <span class="bin__idx">A3</span>
+          <div class="bin__main">
+            <h3>Mini version control system</h3>
+            <p>A Git-style content-addressable store in C, where every file and commit is saved under the hash of its contents. It uses hashed blobs, trees and commits, a Merkle tree and a commit history graph.</p>
+            <ul class="chips"><li>C</li><li>Hash tables</li><li>Merkle trees</li></ul>
+          </div>
+          <div class="bin__meta">
+            <span class="status"><span class="led led--warn"></span> In progress</span>
+          </div>
+          <div class="hashlab">
+            <div class="hashlab__in">
+              <label for="blob-in" class="spec-label">Blob contents: edit me</label>
+              <textarea id="blob-in" rows="3" spellcheck="false">Hardware that listens.
+Software that learns.</textarea>
+            </div>
+            <div class="hashlab__out">
+              <p class="spec-label">Stored at</p>
+              <output id="blob-out" for="blob-in" aria-live="polite">.git/objects/--/----</output>
+              <p class="hashlab__note">SHA-1 of <code>"blob &lt;size&gt;\0" + contents</code>, the same address <code>git hash-object</code> gives. Change one character and the whole address changes.</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="bin__row reveal">
+          <span class="bin__idx">A4</span>
+          <div class="bin__main">
+            <h3>Visual automation builder</h3>
+            <p>A full-stack app where users connect triggers to actions on a node canvas, and an execution engine runs the workflow.</p>
+            <ul class="chips"><li>React</li><li>Node graph</li><li>APIs</li></ul>
+          </div>
+          <div class="bin__meta">
+            <span class="status"><span class="led led--warn"></span> In progress</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
     <!-- sections -->
   </main>
 
   <script src="js/main.js"></script>
   <script src="js/hero.js"></script>
+  <script src="js/demos.js"></script>
 </body>
 </html>
