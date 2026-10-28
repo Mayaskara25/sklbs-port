@@ -30,4 +30,6 @@ Run `npm run refresh:activity` to update `public/activity.json`, then rebuild. A
 
 Run `npm run sync:github` from this workspace’s `Portfolio` directory. It maintains a separate sibling checkout named `kushal-port`, based on `Mayaskara25/sklbs-port`, and copies only the portfolio’s source and public assets. It builds before committing and pushes only to `kushal-port`, without force-pushing or changing `main`. It stops if that checkout contains user edits, the remote has diverged, or the authenticated GitHub account lacks Write access. Sites hosting identity, dependencies, and build output are excluded from the GitHub copy.
 
+The recurring check runs every five minutes using `npm run sync:github -- --min-lines=100`. It creates a checkpoint once the combined added and removed text-line count reaches 100; smaller edits accumulate. Binary asset changes trigger a checkpoint without waiting for a text-line threshold. A manually run command without the threshold checkpoints all current changes. Pending committed changes can be pushed as soon as repository Write access is available.
+
 The brief on semantic HTML, selectors, the box model, Flexbox, and responsive behavior is in [TECHNIQUES.md](TECHNIQUES.md).
